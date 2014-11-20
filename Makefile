@@ -17,5 +17,8 @@ hdfs_url.o:
 MPIHook.o:
 	$(CC) $(CFLAGS) MPIHook.c
 
+test:
+	$(CC) MPITest.c -o MPITest
+
 clean:
 	rm -rf *.o MPIHook.so
