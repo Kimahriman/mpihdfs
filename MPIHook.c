@@ -239,7 +239,8 @@ int MPI_File_read_at(MPI_File fh, MPI_Offset offset, void *buf,
 
 	status("HDFS file found in File_read_at.\n");
 
-	MPI_Type_size(datatype, &size);
+	//MPI_Type_size(datatype, &size);
+	size = 1;
 
 	status("Got type size: %d.\n", size);
 	status("Offset: %d\n", offset);
