@@ -8,17 +8,17 @@ LDFLAGS=-L$(HDFS_NATIVE) -L$(LIB_JVM) -lhdfs -ljvm -ldl -shared -fPIC
 
 all: hook
 
-hook: hdfs_url.o MPIHook.o
-	$(CC) $(LDFLAGS) hdfs_url.o MPIHook.o -o MPIHook.so
+debug: CFLAGS += -DDEBUG
+debug: hook
 
-hdfs_url.o:
-	$(CC) $(CFLAGS) hdfs_url.c
+hook: hdfs_url.o MPIHook.o MPIFile.o MPISync.o
+	$(CC) $(LDFLAGS) hdfs_url.o MPIHook.o MPIFile.o MPISync.o -o MPIHook.so
 
-MPIHook.o:
-	$(CC) $(CFLAGS) MPIHook.c
+%.o:
+	$(CC) $(CFLAGS) $*.c
 
 test:
 	$(CC) MPITest.c -o MPITest
 
 clean:
-	rm -rf *.o MPIHook.so
+	rm -rf *.o MPIHook.so MPITest
