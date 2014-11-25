@@ -14,10 +14,10 @@ debug: hook
 hook: hdfs_url.o MPIHook.o MPIFile.o MPISync.o
 	$(CC) $(LDFLAGS) hdfs_url.o MPIHook.o MPIFile.o MPISync.o -o MPIHook.so
 
-%.o:
-	$(CC) $(CFLAGS) $*.c
+%.o: %.c
+	$(CC) $(CFLAGS) $<
 
-test:
+test: MPITest.c
 	$(CC) MPITest.c -o MPITest
 
 clean:

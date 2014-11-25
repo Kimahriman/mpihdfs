@@ -15,7 +15,7 @@
 #ifdef DEBUG
 #define status(str, ...) printf(str, ##__VA_ARGS__)
 #else
-#define status(str)
+#define status(str, ...)
 #endif
 
 #define HDFSFILEMAGIC 0x19d48be3
