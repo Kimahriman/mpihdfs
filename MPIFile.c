@@ -150,7 +150,6 @@ int MPI_File_delete(char *filename, MPI_Info info)
 	fs = hdfsBuilderConnect(builder);
 	if (!fs) {
 		fprintf(stderr, "Failed to connect to hdfs.\n");
-		free(fh_w);		
 		return -1;
 	}
 
@@ -238,7 +237,7 @@ int MPI_File_seek(MPI_File fh, MPI_Offset offset, int whence)
 	{
 		int (*real_MPI_File_seek)(MPI_File, MPI_Offset, int) = NULL;
 		real_MPI_File_seek = dlsym(RTLD_NEXT, "MPI_File_seek");
-		if (!real_MPI_File_get_amode) {
+		if (!real_MPI_File_seek) {
 			fprintf(stderr, "Failed to load actual MPI_File_seek location.\n");
 			return -1;
 		}
@@ -263,6 +262,7 @@ int MPI_File_seek(MPI_File fh, MPI_Offset offset, int whence)
 			fprintf(stderr, "Failed to seek in hdfs file.\n");
 			return -1;
 		}
+	}
 	else {
 		fprintf(stderr, "Operation not supported.\n");
 		return -1;
