@@ -118,7 +118,44 @@ int MPI_File_close(MPI_File *fh)
 
 	return MPI_SUCCESS;
 }
-int MPI_File_delete(char *filename, MPI_Info info) { NOT_IMPLEMENTED; }
+int MPI_File_delete(char *filename, MPI_Info info)
+{
+	char fsname[BUF_SIZE];
+	char hdfs_filename[BUF_SIZE];
+	hdfsFile file;
+	struct hdfsBuilder *builder;
+	hdfsFS fs;
+
+	status("File_delete called.\n");
+
+	if (hdfs_url_parse(filename, fsname, BUF_SIZE, hdfs_filename, BUF_SIZE)) {
+		int (*real_MPI_File_delete)(char *, MPI_Info) = NULL;
+		real_MPI_File_delete = dlsym(RTLD_NEXT, "MPI_File_delete");
+		if (!real_MPI_File_delete) {
+			fprintf(stderr, "Failed to load actual MPI_File_open location.\n");
+			return -1;
+		}
+		status("Passing File_delete call to actual MPI function.\n");
+		return real_MPI_File_delete(filename, info);
+	}
+
+	builder = hdfsNewBuilder();
+	if (!builder) {
+		fprintf(stderr, "Failed to make new hdfsBuilder.\n");
+		return -1;
+	}
+
+	hdfsBuilderSetNameNode(builder, fsname);
+
+	fs = hdfsBuilderConnect(builder);
+	if (!fs) {
+		fprintf(stderr, "Failed to connect to hdfs.\n");
+		free(fh_w);		
+		return -1;
+	}
+
+	return hdfsDelete(fs, hdfs_filename, 1);
+}
 int MPI_File_set_size(MPI_File fh, MPI_Offset size) { NOT_IMPLEMENTED; }
 int MPI_File_preallocate(MPI_File fh, MPI_Offset size) { NOT_IMPLEMENTED; }
 int MPI_File_get_size(MPI_File fh, MPI_Offset *size)
@@ -189,6 +226,80 @@ int MPI_File_set_view(MPI_File fh, MPI_Offset disp, MPI_Datatype etype,
 int MPI_File_get_view(MPI_File fh, MPI_Offset *disp, 
                  MPI_Datatype *etype, MPI_Datatype *filetype, char *datarep) { NOT_IMPLEMENTED; }
 
-int MPI_File_seek(MPI_File fh, MPI_Offset offset, int whence) { NOT_IMPLEMENTED; }
-int MPI_File_get_position(MPI_File fh, MPI_Offset *offset) { NOT_IMPLEMENTED; }
+int MPI_File_seek(MPI_File fh, MPI_Offset offset, int whence)
+{
+	hdfsFile_wrapper *fh_w;
+	
+	status("File_seek called.\n");
+
+	fh_w = (hdfsFile_wrapper*)fh;
+
+	if (fh_w->magic != HDFSFILEMAGIC)
+	{
+		int (*real_MPI_File_seek)(MPI_File, MPI_Offset, int) = NULL;
+		real_MPI_File_seek = dlsym(RTLD_NEXT, "MPI_File_seek");
+		if (!real_MPI_File_get_amode) {
+			fprintf(stderr, "Failed to load actual MPI_File_seek location.\n");
+			return -1;
+		}
+
+		status("Passing File_seek to actual MPI function.\n");
+		return real_MPI_File_seek(fh, offset, whence);
+	}
+
+	if (whence == MPI_SEEK_SET) {
+		if (hdfsSeek(fh_w->fs, fh_w->file, offset)) {
+			fprintf(stderr, "Failed to seek in hdfs file.\n");
+			return -1;
+		}
+	}
+	else if (whence == MPI_SEEK_CUR) {
+		tOffset cur_off = hdfsTell(fh_w->fs, fh_w->file);
+		if (offset == -1) {
+			fprintf(stderr, "Failed to tell for seek in hdfs file.\n");
+			return -1;
+		}
+		if (hdfsSeek(fh_w->fs, fh_w->file, cur_off + offset)) {
+			fprintf(stderr, "Failed to seek in hdfs file.\n");
+			return -1;
+		}
+	else {
+		fprintf(stderr, "Operation not supported.\n");
+		return -1;
+	}
+		
+	return MPI_SUCCESS;
+}
+int MPI_File_get_position(MPI_File fh, MPI_Offset *offset)
+{
+	hdfsFile_wrapper *fh_w;
+	tOffset cur_off;
+	
+	status("File_get_byte_offset called.\n");
+
+	fh_w = (hdfsFile_wrapper*)fh;
+
+	if (fh_w->magic != HDFSFILEMAGIC)
+	{
+		int (*real_MPI_File_get_position)(MPI_File, MPI_Offset *) = NULL;
+		real_MPI_File_get_position = dlsym(RTLD_NEXT, "MPI_File_get_position");
+		if (!real_MPI_File_get_position) {
+			fprintf(stderr, "Failed to load actual MPI_File_get_position location.\n");
+			return -1;
+		}
+
+		status("Passing File_get_position to actual MPI function.\n");
+		return real_MPI_File_get_position(fh, offset);
+	}
+
+	cur_off = hdfsTell(fh_w->fs, fh_w->file);
+	if (cur_off == -1) {
+		fprintf(stderr, "Failed to get position in hdfs file.\n");
+		return -1;
+	}
+
+	*offset = cur_off;
+
+	return MPI_SUCCESS;
+}
 int MPI_File_get_byte_offset(MPI_File fh, MPI_Offset offset, MPI_Offset *disp) { NOT_IMPLEMENTED; }
