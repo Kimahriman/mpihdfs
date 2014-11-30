@@ -81,7 +81,7 @@ int main(int argc, char * argv[]) {
 	//	printf("Total wall clock time: %.21lf seconds.\n", end-start);
 	//}
 
-	MPI_File in;
+	MPI_File in, out, out2;
 	int err, len;
 	char buf[4096];
 
@@ -91,25 +91,66 @@ int main(int argc, char * argv[]) {
 	if (err != MPI_SUCCESS)
 	{
 		printf("Error: file open. code: %d. \n", err);
-		MPI_Error_string(err, buf, &len);
-		printf("Error string: %s. \n", buf); 
 		MPI_Finalize();
-		exit(1);
+		exit(-1);
+	}
+
+	err = MPI_File_open(MPI_COMM_WORLD, argv[2], MPI_MODE_WRONLY, MPI_INFO_NULL, &out);
+	if (err != MPI_SUCCESS)
+	{
+		printf("Error: file open write. code: %d. \n", err);
+		MPI_Finalize();
+		exit(-1);
+	}
+	err = MPI_File_open(MPI_COMM_WORLD, argv[2], MPI_MODE_WRONLY, MPI_INFO_NULL, &out2);
+	if (err != MPI_SUCCESS)
+	{
+		printf("Error: file open write. code: %d. \n", err);
+		MPI_Finalize();
+		exit(-1);
 	}
 
 	MPI_File_get_size(in, &file_size);
 	printf("Total size: %lu bytes.\n", file_size);
 	
 	if (file_size < sizeof(buf)) {
-		MPI_File_read(in, buf, file_size, MPI_CHAR, NULL);
+		err = MPI_File_read(in, buf, file_size, MPI_CHAR, NULL);
+		if (err == -1) {
+			printf("Error: file read. code: %d. \n", err);
+			MPI_Finalize();
+			exit(-1);
+		}
 		buf[file_size] = 0;
 		puts(buf);
 	}
 
+	err = MPI_File_write(out, buf, file_size, MPI_CHAR, NULL);
+	if (err == -1) {
+		printf("Error: file write. code: %d. \n", err);
+		MPI_Finalize();
+		exit(-1);
+	}
+
+	err = MPI_File_write(out2, buf, file_size, MPI_CHAR, NULL);
+	if (err == -1) {
+		printf("Error: file write. code: %d. \n", err);
+		MPI_Finalize();
+		exit(-1);
+	}
 	err = MPI_File_close(&in);
 	if (err != MPI_SUCCESS)
 	{
-		printf("Error: file close. code: %d.\n", err);
+		printf("Error: file close. code: %d. \n", err);
+	}
+	err = MPI_File_close(&out);
+	if (err != MPI_SUCCESS)
+	{
+		printf("Error: file close. code: %d. \n", err);
+	}
+	err = MPI_File_close(&out2);
+	if (err != MPI_SUCCESS)
+	{
+		printf("Error: file close. code: %d. \n", err);
 	}
 
 	MPI_Finalize();

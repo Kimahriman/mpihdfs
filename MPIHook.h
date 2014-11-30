@@ -25,11 +25,12 @@
 
 typedef struct
 {
-	int32_t magic;
-	hdfsFS fs;
-	hdfsFile file;
-	char *filename;
-	int amode;
+	int32_t magic;	// Indicates this is HDFS object
+	hdfsFS fs;	// HDFS file system object
+	hdfsFile file;	// HDFS file object
+	char *filename; // Name of file in HDFS
+	int mode;	// Mode for opening in HDFS
+	int amode;	// Mode for opening in MPI
 } hdfsFile_wrapper;
 
 #endif

@@ -6,10 +6,13 @@ LIB_JVM=$(JAVA_HOME)/jre/lib/amd64/server
 CFLAGS=-c -I$(HDFS_INCLUDE) -fPIC
 LDFLAGS=-L$(HDFS_NATIVE) -L$(LIB_JVM) -lhdfs -ljvm -ldl -shared -fPIC
 
-all: hook
+all: clean-main hook
 
 debug: CFLAGS += -DDEBUG
-debug: hook
+debug: all
+
+default: CFLAGS += -DDEFAULT
+default: all
 
 hook: hdfs_url.o MPIHook.o MPIFile.o MPISync.o
 	$(CC) $(LDFLAGS) hdfs_url.o MPIHook.o MPIFile.o MPISync.o -o MPIHook.so
@@ -17,8 +20,13 @@ hook: hdfs_url.o MPIHook.o MPIFile.o MPISync.o
 %.o: %.c
 	$(CC) $(CFLAGS) $<
 
-test: MPITest.c
+test: clean-test MPITest.c
 	$(CC) MPITest.c -o MPITest
 
-clean:
-	rm -rf *.o MPIHook.so MPITest
+clean-main:
+	rm -f *.o MPIHook.so
+
+clean-test:
+	rm -f MPITest
+
+clean: clean-main clean-test

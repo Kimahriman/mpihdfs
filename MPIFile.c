@@ -10,12 +10,14 @@ int MPI_File_open(MPI_Comm comm, char *filename, int amode,
 	char fsname[BUF_SIZE];
 	char hdfs_filename[BUF_SIZE];
 	hdfsFile_wrapper *fh_w;
-	hdfsFile file;
+	hdfsFile file = NULL;
 	struct hdfsBuilder *builder;
 	hdfsFS fs;
+	int mode;
 
 	status("File_open called.\n");
 
+#ifndef DEFAULT
 	if (hdfs_url_parse(filename, fsname, BUF_SIZE, hdfs_filename, BUF_SIZE)) {
 		int (*real_MPI_File_open)(MPI_Comm, const char*, int, MPI_Info, MPI_File *) = NULL;
 		real_MPI_File_open = dlsym(RTLD_NEXT, "MPI_File_open");
@@ -26,9 +28,16 @@ int MPI_File_open(MPI_Comm comm, char *filename, int amode,
 		status("Passing File_open call to actual MPI function.\n");
 		return real_MPI_File_open(comm, filename, amode, info, fh);
 	}
+#endif
 
-	if (amode != MPI_MODE_RDONLY) {
-		fprintf(stderr, "Only reading from HDFS is supported currently.\n");
+	if (amode & MPI_MODE_RDONLY) {
+		mode = O_RDONLY;
+	}
+ 	else if (amode & MPI_MODE_WRONLY) {
+		mode = O_WRONLY;
+	}
+	else {
+		fprintf(stderr, "Only reading or writing to HDFS is supported currently.\n");
 		return -1;
 	}
 
@@ -47,7 +56,12 @@ int MPI_File_open(MPI_Comm comm, char *filename, int amode,
 		return -1;
 	}
 
+#ifndef DEFAULT
 	hdfsBuilderSetNameNode(builder, fsname);
+#else
+	hdfsBuilderSetNameNode(builder, "default");
+	strcpy(hdfs_filename, filename);
+#endif
 
 	fs = hdfsBuilderConnect(builder);
 	if (!fs) {
@@ -56,12 +70,15 @@ int MPI_File_open(MPI_Comm comm, char *filename, int amode,
 		return -1;
 	}
 
-	file = hdfsOpenFile(fs, hdfs_filename, O_RDONLY, 0, 0, 0);
-	if (!file) {
-		fprintf(stderr, "Failed to open hdfs file.\n");
-		free(fh_w);
-		return -1;
-	}	
+	// Only open files for writing in the write functions
+	if (mode == O_RDONLY) {
+		file = hdfsOpenFile(fs, hdfs_filename, mode, 0, 0, 0);
+		if (!file) {
+			fprintf(stderr, "Failed to open hdfs file.\n");
+			free(fh_w);
+			return -1;
+		}	
+	}
 
 	fh_w->filename = malloc(strlen(hdfs_filename) + 1);
 	if (!fh_w->filename) {
@@ -74,6 +91,7 @@ int MPI_File_open(MPI_Comm comm, char *filename, int amode,
 
 	fh_w->fs = fs;
 	fh_w->file = file;
+	fh_w->mode = mode;
 	fh_w->amode = amode;
 	*fh = (MPI_File)fh_w;
 
@@ -104,15 +122,20 @@ int MPI_File_close(MPI_File *fh)
 
 	status("HDFS file found in File_close.\n");
 
-	ret = hdfsCloseFile(fh_w->fs, fh_w->file);
-
-	if (ret) {
-		fprintf(stderr, "Failed to close hdfs file.\n");
-		return -1;
+	if (fh_w->file) {
+		ret = hdfsCloseFile(fh_w->fs, fh_w->file);
+	
+		if (ret) {
+			fprintf(stderr, "Failed to close hdfs file.\n");
+			return -1;
+		}
 	}
 
-	free(fh_w->filename);
-	free(fh_w);
+	if (fh_w) {
+		if (fh_w->filename)
+			free(fh_w->filename);
+		free(fh_w);
+	}
 
 	status("File_close returning successfully.\n");
 
