@@ -1,3 +1,5 @@
+#!/bin/sh
+
 HDFS_NATIVE=$HADOOP_HOME/lib/native
 LIB_JVM=$JAVA_HOME/jre/lib/amd64/server
 MPIHOOK_PATH=/usr/local/hadoop/native/MPIHook.so
@@ -23,5 +25,6 @@ do
 done
 
 export CLASSPATH=$CLASSPATH
+
 
 $@
