@@ -1,2 +1,10 @@
 *.o
 *.so
+*.dvi
+*.aux
+*.ps
+*.log
+*.bbl
+*.blg
+.*
+!.gitignore
