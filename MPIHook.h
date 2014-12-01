@@ -5,6 +5,7 @@
 
 #include "hdfs.h"
 #include "hdfs_url.h"
+#include "options.h"
 #include <mpi.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -19,7 +20,6 @@
 #endif
 
 #define HDFSFILEMAGIC 0x19d48be3
-#define BUF_SIZE 4096
 
 #define NOT_IMPLEMENTED { fprintf(stderr, "Function not implemented.\n"); return -1; }
 
