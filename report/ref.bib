@@ -23,6 +23,11 @@
 	howpublished =
 	{\url{https://github.com/remis-thoughts/native-hdfs-fuse}},
 }
+@misc{mr,
+	title = {{Hadoop MapReduce}},
+	howpublished =
+	{\url{http://hadoop.apache.org/docs/r1.2.1/mapred_tutorial.html}},
+}
 @misc{proxy,
 	title = {hdfs-nfs-proxy},
 	howpublished =
@@ -34,6 +39,17 @@
 	{\url{www.mpich.org}},
 }
 
+@inproceedings{gfs,
+	author = {Ghemawat, Sanjay and Gobioff, Howard and Leung, Shun-Tak},
+	title = {The Google File System},
+	booktitle = {Proc. of the 19th ACM SOSP},
+	year = {2003},
+	isbn = {1-58113-757-5},
+	numpages = {15},
+	url = {http://doi.acm.org/10.1145/945445.945450},
+	doi = {10.1145/945445.945450},
+	acmid = {945450},
+} 
 @misc{openmpi,
 	title = {Open MPI},
 	howpublished =
@@ -83,6 +99,29 @@
 	PAGES = {-1--1},
 	YEAR = {2014},
 }
+@inproceedings{mesos,
+	title={Mesos: A Platform for Fine-Grained Resource Sharing in the Data
+		Center.},
+	author={Hindman, Benjamin and Konwinski, Andy and Zaharia, Matei and
+		Ghodsi, Ali and Joseph, Anthony D and Katz, Randy H and
+			Shenker, Scott and Stoica, Ion},
+	booktitle={NSDI},
+	volume={11},
+	pages={22--22},
+	year={2011}
+}
+@inproceedings{omega,
+	title = {Omega: flexible, scalable schedulers for large compute
+		clusters},
+	author  = {Malte Schwarzkopf and Andy Konwinski and Michael Abd-El-Malek
+		and John Wilkes},
+	year  = 2013,
+	URL =
+	{http://eurosys2013.tudos.org/wp-content/uploads/2013/paper/Schwarzkopf.pdf},
+	booktitle = {SIGOPS European Conference on Computer Systems (EuroSys)},
+	pages = {351--364},
+	address = {Prague, Czech Republic}
+}
 @TECHREPORT{CMU-PDL-12-115,
 	AUTHOR =        {Chuck Cranor, Milo Polte, Garth Gibson},
 	TITLE =         {HPC Computation on Hadoop Storage with PLFS},
@@ -92,4 +131,83 @@
 	MONTH =         {November},
 	YEAR  =         {2012},
 	URL   =         {http://www.pdl.cmu.edu/PDL-FTP/HECStorage/CMU-PDL-12-115.pdf}
+}
+@article{meta,
+	title={A bioinformatician's guide to metagenomics},
+	author={Kunin, Victor and Copeland, Alex and Lapidus, Alla and
+		Mavromatis, Konstantinos and Hugenholtz, Philip},
+	journal={Microbiology and Molecular Biology Reviews},
+	volume={72},
+	number={4},
+	pages={557--578},
+	year={2008},
+	publisher={Am Soc Microbiol}
+}
+@inproceedings{catch,
+	title={Catch: A cloud-based adaptive data transfer service for hpc},
+	author={Monti, Henry M and Butt, Ali Raza and Vazhkudai, Sudharshan
+		S},
+	booktitle={Proc. IPDPS},
+	year={2011},
+}
+@TECHREPORT{mpi2012,
+	AUTHOR={Message Passing Interface Forum},
+	TITLE={MPI: A Message-Passing Interface Standard},
+	version={Version 3.0},
+	INSTITUTION={Message Passing Interface Forum},
+	MONTH={September},
+	YEAR={2012},
+	PAGES={http://www.mpi-forum.org/},
+	url={http://www.mpi-forum.org/docs/mpi-3.0/mpi30-report.pdf}
+}
+@misc{hadoop,
+	title = {{Apache. Hadoop.}},
+	howpublished =
+	{\url{http://hadoop.apache.org/}},
+}
+@misc{nfs1,
+	title = {{Network File System}},
+	howpublished =
+	{\url{http://en.wikipedia.org/wiki/Network_File_System}},
+}
+@inproceedings{pvfs,
+	title={PVFS: A parallel file system for Linux clusters},
+	author={Ross, Robert B and Thakur, Rajeev and others},
+	booktitle={in Proceedings of the 4th Annual Linux Showcase and
+		Conference},
+	pages={391--430},
+	year={2000}
+}
+@inproceedings{lustre,
+	title={Lustre: Building a file system for 1000-node clusters},
+	author={Schwan, Philip},
+	booktitle={Proceedings of the 2003 Linux Symposium},
+	volume={2003},
+	year={2003}
+}
+@inproceedings{gpfs,
+	title={GPFS: A Shared-Disk File System for Large Computing Clusters.},
+	author={Schmuck, Frank B and Haskin, Roger L},
+	booktitle={FAST},
+	volume={2},
+	pages={19},
+	year={2002}
+}
+@inproceedings{mpigpfs,
+	title={MPI-IO/GPFS, an optimized implementation of MPI-IO on top of
+		GPFS},
+	author={Prost, J-P and Treumann, Richard and Hedges, Richard and
+		Jia, Bin and Koniges, Alice},
+	booktitle={Supercomputing, ACM/IEEE 2001 Conference},
+	pages={58--58},
+	year={2001},
+	organization={IEEE}
+}
+@incollection{mpipvfs,
+	title={Improving mpi-i/o performance on pvfs},
+	author={Ilroy, Jonathan and Randriamaro, Cyrille and Utard, Gil},
+	booktitle={Euro-Par 2001 Parallel Processing},
+	pages={911--915},
+	year={2001},
+	publisher={Springer}
 }
