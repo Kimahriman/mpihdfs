@@ -81,11 +81,9 @@ int main(int argc, char * argv[]) {
 	//	printf("Total wall clock time: %.21lf seconds.\n", end-start);
 	//}
 
-	MPI_File in, out, out2;
+	MPI_File in, out;
 	int err, len;
 	char buf[4096];
-
-	printf("MPI_SUCCESS: %d\n", MPI_SUCCESS);
 
 	err = MPI_File_open(MPI_COMM_WORLD, argv[1], MPI_MODE_RDONLY, MPI_INFO_NULL, &in);
 	if (err != MPI_SUCCESS)
@@ -95,14 +93,7 @@ int main(int argc, char * argv[]) {
 		exit(-1);
 	}
 
-	err = MPI_File_open(MPI_COMM_WORLD, argv[2], MPI_MODE_WRONLY, MPI_INFO_NULL, &out);
-	if (err != MPI_SUCCESS)
-	{
-		printf("Error: file open write. code: %d. \n", err);
-		MPI_Finalize();
-		exit(-1);
-	}
-	err = MPI_File_open(MPI_COMM_WORLD, argv[2], MPI_MODE_WRONLY, MPI_INFO_NULL, &out2);
+	err = MPI_File_open(MPI_COMM_WORLD, argv[2], MPI_MODE_WRONLY | MPI_MODE_CREATE, MPI_INFO_NULL, &out);
 	if (err != MPI_SUCCESS)
 	{
 		printf("Error: file open write. code: %d. \n", err);
@@ -114,7 +105,7 @@ int main(int argc, char * argv[]) {
 	printf("Total size: %lu bytes.\n", file_size);
 	
 	if (file_size < sizeof(buf)) {
-		err = MPI_File_read(in, buf, file_size, MPI_CHAR, NULL);
+		err = MPI_File_read(in, buf, file_size, MPI_CHAR, MPI_STATUS_IGNORE);
 		if (err == -1) {
 			printf("Error: file read. code: %d. \n", err);
 			MPI_Finalize();
@@ -124,30 +115,19 @@ int main(int argc, char * argv[]) {
 		puts(buf);
 	}
 
-	err = MPI_File_write(out, buf, file_size, MPI_CHAR, NULL);
+	err = MPI_File_write(out, buf, file_size, MPI_CHAR, MPI_STATUS_IGNORE);
 	if (err == -1) {
 		printf("Error: file write. code: %d. \n", err);
 		MPI_Finalize();
 		exit(-1);
 	}
 
-	err = MPI_File_write(out2, buf, file_size, MPI_CHAR, NULL);
-	if (err == -1) {
-		printf("Error: file write. code: %d. \n", err);
-		MPI_Finalize();
-		exit(-1);
-	}
 	err = MPI_File_close(&in);
 	if (err != MPI_SUCCESS)
 	{
 		printf("Error: file close. code: %d. \n", err);
 	}
 	err = MPI_File_close(&out);
-	if (err != MPI_SUCCESS)
-	{
-		printf("Error: file close. code: %d. \n", err);
-	}
-	err = MPI_File_close(&out2);
 	if (err != MPI_SUCCESS)
 	{
 		printf("Error: file close. code: %d. \n", err);
