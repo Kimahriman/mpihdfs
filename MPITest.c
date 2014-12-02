@@ -115,12 +115,12 @@ int main(int argc, char * argv[]) {
 		puts(buf);
 	}
 
-	err = MPI_File_write(out, buf, file_size, MPI_CHAR, MPI_STATUS_IGNORE);
+	/*err = MPI_File_write(out, buf, file_size, MPI_CHAR, MPI_STATUS_IGNORE);
 	if (err == -1) {
 		printf("Error: file write. code: %d. \n", err);
 		MPI_Finalize();
 		exit(-1);
-	}
+	}*/
 
 	err = MPI_File_close(&in);
 	if (err != MPI_SUCCESS)

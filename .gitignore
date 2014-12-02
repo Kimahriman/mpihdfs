@@ -6,5 +6,6 @@
 *.log
 *.bbl
 *.blg
+*.txt
 .*
 !.gitignore

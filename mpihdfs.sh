@@ -2,7 +2,7 @@
 
 HDFS_NATIVE=$HADOOP_HOME/lib/native
 LIB_JVM=$JAVA_HOME/jre/lib/amd64/server
-MPIHOOK_PATH=/usr/local/hadoop/native/MPIHook.so
+MPIHOOK_PATH=/home/xuluna/mpihdfs/MPIHook.so
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HDFS_NATIVE:$LIB_JVM
 export LD_PRELOAD=$MPIHOOK_PATH

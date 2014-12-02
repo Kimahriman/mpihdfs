@@ -48,15 +48,15 @@ int MPI_File_read_at(MPI_File fh, MPI_Offset offset, void *buf,
 
 int MPI_File_read_at_all(MPI_File fh, MPI_Offset offset, void *buf,
 	      int count, MPI_Datatype datatype, MPI_Status *status) { NOT_IMPLEMENTED; }
-int MPI_File_write_at(MPI_File fh, MPI_Offset offset, void *buf,
+int MPI_File_write_at(MPI_File fh, MPI_Offset offset, const void *buf,
 	      int count, MPI_Datatype datatype, MPI_Status *status) { NOT_IMPLEMENTED; }
-int MPI_File_write_at_all(MPI_File fh, MPI_Offset offset, void *buf,
+int MPI_File_write_at_all(MPI_File fh, MPI_Offset offset, const void *buf,
 	      int count, MPI_Datatype datatype, MPI_Status *status) { NOT_IMPLEMENTED; }
 
 
 int MPI_File_iread_at(MPI_File fh, MPI_Offset offset, void *buf,
 	      int count, MPI_Datatype datatype, MPIO_Request *request) { NOT_IMPLEMENTED; }
-int MPI_File_iwrite_at(MPI_File fh, MPI_Offset offset, void *buf,
+int MPI_File_iwrite_at(MPI_File fh, MPI_Offset offset, const void *buf,
 	      int count, MPI_Datatype datatype, MPIO_Request *request) { NOT_IMPLEMENTED; }
 
 int MPI_File_read(MPI_File fh, void *buf, int count, MPI_Datatype datatype, MPI_Status *status)
@@ -100,7 +100,7 @@ int MPI_File_read(MPI_File fh, void *buf, int count, MPI_Datatype datatype, MPI_
 
 }
 int MPI_File_read_all(MPI_File fh, void *buf, int count, MPI_Datatype datatype, MPI_Status *status) { NOT_IMPLEMENTED; } 
-int MPI_File_write(MPI_File fh, void *buf, int count, MPI_Datatype datatype, MPI_Status *status)
+int MPI_File_write(MPI_File fh, const void *buf, int count, MPI_Datatype datatype, MPI_Status *status)
 {
 	hdfsFile_wrapper *fh_w;
 	int ret, size, mode;
@@ -112,7 +112,7 @@ int MPI_File_write(MPI_File fh, void *buf, int count, MPI_Datatype datatype, MPI
 
 	if (fh_w->magic != HDFSFILEMAGIC)
 	{
-		int (*real_MPI_File_write)(MPI_File, void*, int, MPI_Datatype, MPI_Status*) = NULL;
+		int (*real_MPI_File_write)(MPI_File, const void*, int, MPI_Datatype, MPI_Status*) = NULL;
 		real_MPI_File_write = dlsym(RTLD_NEXT, "MPI_File_write");
 		if (!real_MPI_File_write)
 			fprintf(stderr, "Failed to load actual MPI_File_close location.\n");
@@ -164,5 +164,5 @@ int MPI_File_write(MPI_File fh, void *buf, int count, MPI_Datatype datatype, MPI
 
 	return MPI_SUCCESS;
 }
-int MPI_File_write_all(MPI_File fh, void *buf, int count, MPI_Datatype datatype, MPI_Status *status) { NOT_IMPLEMENTED; }
+int MPI_File_write_all(MPI_File fh, const void *buf, int count, MPI_Datatype datatype, MPI_Status *status) { NOT_IMPLEMENTED; }
 

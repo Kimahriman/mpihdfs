@@ -6,7 +6,7 @@
  * and assumes all MPI file interactions are with the default HDFS running
  * on the machine.
  */
-//#define DEFAULT
+#define DEFAULT
 
 /*
  * The NO_MPI option forces the hooking functions to not call any other MPI
