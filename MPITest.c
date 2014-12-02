@@ -95,7 +95,7 @@ int main(int argc, char * argv[]) {
 		exit(-1);
 	}
 
-	err = MPI_File_open(MPI_COMM_WORLD, argv[2], MPI_MODE_WRONLY, MPI_INFO_NULL, &out);
+	err = MPI_File_open(MPI_COMM_WORLD, argv[2], MPI_MODE_WRONLY | MPI_MODE_CREATE, MPI_INFO_NULL, &out);
 	if (err != MPI_SUCCESS)
 	{
 		printf("Error: file open write. code: %d. \n", err);
