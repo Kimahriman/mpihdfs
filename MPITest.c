@@ -85,8 +85,6 @@ int main(int argc, char * argv[]) {
 	int err, len;
 	char buf[4096];
 
-	printf("MPI_SUCCESS: %d\n", MPI_SUCCESS);
-
 	err = MPI_File_open(MPI_COMM_WORLD, argv[1], MPI_MODE_RDONLY, MPI_INFO_NULL, &in);
 	if (err != MPI_SUCCESS)
 	{
@@ -107,7 +105,7 @@ int main(int argc, char * argv[]) {
 	printf("Total size: %lu bytes.\n", file_size);
 	
 	if (file_size < sizeof(buf)) {
-		err = MPI_File_read(in, buf, file_size, MPI_CHAR, NULL);
+		err = MPI_File_read(in, buf, file_size, MPI_CHAR, MPI_STATUS_IGNORE);
 		if (err == -1) {
 			printf("Error: file read. code: %d. \n", err);
 			MPI_Finalize();
@@ -117,7 +115,7 @@ int main(int argc, char * argv[]) {
 		puts(buf);
 	}
 
-	err = MPI_File_write(out, buf, file_size, MPI_CHAR, NULL);
+	err = MPI_File_write(out, buf, file_size, MPI_CHAR, MPI_STATUS_IGNORE);
 	if (err == -1) {
 		printf("Error: file write. code: %d. \n", err);
 		MPI_Finalize();
