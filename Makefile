@@ -7,7 +7,7 @@ CFLAGS=-c -I$(HDFS_INCLUDE) -fPIC
 LDFLAGS=-L$(HDFS_NATIVE) -L$(LIB_JVM) -lhdfs -ljvm -ldl -shared -fPIC
 OBJS=hdfs_url.o MPIHook.o MPIFile.o MPISync.o
 
-all: clean-main hook
+all: clean hook test bench
 
 debug: CFLAGS += -DDEBUG
 debug: all
@@ -21,10 +21,16 @@ hook: $(OBJS)
 test: clean-test MPITest.c
 	$(CC) MPITest.c -o MPITest
 
+bench: clean-bench bench.c
+	$(CC) bench.c -o bench
+
 clean-main:
 	rm -f *.o MPIHook.so
 
 clean-test:
 	rm -f MPITest
 
-clean: clean-main clean-test
+clean-bench:
+	rm -f bench
+
+clean: clean-main clean-test clean-bench

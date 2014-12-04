@@ -18,7 +18,9 @@
 int MPI_File_open(MPI_Comm comm, const char *filename, int amode,
 		  MPI_Info info, MPI_File *fh)
 {
+#ifndef DEFAULT
 	char fsname[BUF_SIZE];
+#endif
 	char hdfs_filename[BUF_SIZE];
 	hdfsFile_wrapper *fh_w;
 	hdfsFile file = NULL;
@@ -167,9 +169,10 @@ int MPI_File_close(MPI_File *fh)
  */
 int MPI_File_delete(const char *filename, MPI_Info info)
 {
+#ifndef DEFAULT
 	char fsname[BUF_SIZE];
+#endif
 	char hdfs_filename[BUF_SIZE];
-	hdfsFile file;
 	struct hdfsBuilder *builder;
 	hdfsFS fs;
 
@@ -180,7 +183,7 @@ int MPI_File_delete(const char *filename, MPI_Info info)
 
 #ifndef DEFAULT
 	if (hdfs_url_parse(filename, fsname, BUF_SIZE, hdfs_filename, BUF_SIZE)) {
-		int (*real_MPI_File_delete)(char *, MPI_Info) = NULL;
+		int (*real_MPI_File_delete)(const char *, MPI_Info) = NULL;
 		real_MPI_File_delete = dlsym(RTLD_NEXT, "MPI_File_delete");
 		if (!real_MPI_File_delete) {
 			fprintf(stderr, "Failed to load actual MPI_File_open location.\n");
