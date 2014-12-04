@@ -4,7 +4,7 @@ have become the dominant distributed processing framework for big data
 analytics. Despite of the ease-of-use and scalibility of Hadoop, researchers
 also found the limitations of Hadoop lie in for example, inter-process
 communication. For such limitations, the well established Message Passing
-Interface (MPI)~\cite{mpi} is more suitable due to its ability to support any
+Interface (MPI)~\cite{mpi2012} is more suitable due to its ability to support any
 communication pattern. X. Lu et al~\cite{xlu} find that  the
 message latency of MPI is about 100 times less than Hadoop
 primitives. The average peak bandwidth of MPI is about
@@ -12,14 +12,14 @@ primitives. The average peak bandwidth of MPI is about
 mechanism in Hadoop. Moreover, there exists data analytics workflows such as
 Metagenomics~\cite{meta} that consist both compute- and communication-intensive
 computations. To better conduct such workflows and to avoid data
-movement between clusters~\cite{???}, resource coordination platforms such as
-mesos~\cite{mesos}, omega~\cite{omega}, YARN~\cite{yarn} enable different
+movement between clusters~\cite{catch}, resource coordination platforms such as
+Mesos~\cite{mesos}, Omega~\cite{omega}, YARN~\cite{yarn2013} enable different
 programming paradigms including MPI and MapReduce to co-exist in the same
 cluster. Though not realized yet, hosting MPI and Hadoop in the same cluster is
 highly promising as YARN claims to embrace MPI as a first class citizen.
 
 One of the biggest challenges of co-hosting MPI and Hadoop is to decide the
-underlying shared file system. As a big feature of MPI-2 standard~\cite{mpi},
+underlying shared file system. As a big feature of MPI-2 standard~\cite{mpi2012},
 MPI-IO provides parallel IO support to MPI programs and enables MPI to process
 data-intensive workloads as well. Currently, such support requires an underlying
 network/parallel file system such as NFS~\cite{nfs1}, PVFS~\cite{pvfs},
@@ -33,11 +33,11 @@ of File Placement Optimization (FPO), GPFS-FPO makes it possible to efficiently
 support Hadoop.  However, GPFS is shipped with IBM SP system and is not
 available as opensource as Lustre. Moreover, IBM tailors MPI-IO according to
 GPFS in their own MPI implementation~\cite{mpigpfs}, which is not supported in
-more wildly used implementations such as MPICH~\cite{} and
+more wildly used implementations such as MPICH~\cite{mpich} and
 OpenMPI~\cite{openmpi}.
 
 Another solution is to support MPI-IO on top of the distributed file systems
-used by MapReduce such as GFS~\cite{} and HDFS~\cite{hdfs}. HDFS is integrated
+used by MapReduce such as GFS~\cite{gfs} and HDFS~\cite{hdfs}. HDFS is integrated
 inherently in Hadoop releases and is the default file system used in Hadoop
 community. By bringing MPI to HDFS, it is possible to keep existing applications
 in Hadoop ecosystem without any changes. C. Cranor et al~\cite{CMU-PDL-12-115} explore the
@@ -52,7 +52,7 @@ the existing methods including FuseDFS~\cite{fuse}, Native Library~\cite{lib},
 HDFS-NFS-Proxy~\cite{proxy}. We also develop our own MPI-IO hook using the
 native library provided by HDFS. In order to evaluate the performance, we also
 developed a MPI-IO benchmark. This report reflects the difficulties we
-encountered, whether each method can be adopted by MPI-IO, and how they performs. 
+encountered, whether each method can be adopted by MPI-IO, and how they perform. 
 
 During our study and development, we encounter several
 challenges including ones that are still not solved yet.
