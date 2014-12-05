@@ -21,6 +21,12 @@
 
 #define HDFSFILEMAGIC 0x19d48be3
 
+#ifdef CONST_BUF
+#define MPIHDFS_CONST const
+#else
+#define MPIHDFS_CONST
+#endif
+
 #define NOT_IMPLEMENTED { fprintf(stderr, "Function not implemented.\n"); return -1; }
 
 typedef struct

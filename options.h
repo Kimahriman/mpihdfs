@@ -18,4 +18,11 @@
  */
 //#define NO_MPI
 
+/*
+ * Depending on the MPICH version, the MPI function prototypes may or may
+ * not use const data buffers. If it does not compile due to conflicting
+ * declaration of files, try turning this option on or off.
+ */
+//#define CONST_BUF
+
 #endif

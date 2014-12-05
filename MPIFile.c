@@ -15,7 +15,7 @@
  * for writing multiple times, as long as only one process is writing to it at
  * a time.
  */
-int MPI_File_open(MPI_Comm comm, const char *filename, int amode,
+int MPI_File_open(MPI_Comm comm, MPIHDFS_CONST char *filename, int amode,
 		  MPI_Info info, MPI_File *fh)
 {
 #ifndef DEFAULT
@@ -167,7 +167,7 @@ int MPI_File_close(MPI_File *fh)
 /*
  * Deletes a file.
  */
-int MPI_File_delete(const char *filename, MPI_Info info)
+int MPI_File_delete(MPIHDFS_CONST char *filename, MPI_Info info)
 {
 #ifndef DEFAULT
 	char fsname[BUF_SIZE];
@@ -297,7 +297,7 @@ int MPI_File_get_info(MPI_File fh, MPI_Info *info) { NOT_IMPLEMENTED; }
 
 /* Section 9.3 */
 int MPI_File_set_view(MPI_File fh, MPI_Offset disp, MPI_Datatype etype,
-	         MPI_Datatype filetype, const char *datarep, MPI_Info info) { NOT_IMPLEMENTED; }
+	         MPI_Datatype filetype, MPIHDFS_CONST char *datarep, MPI_Info info) { NOT_IMPLEMENTED; }
 int MPI_File_get_view(MPI_File fh, MPI_Offset *disp, 
                  MPI_Datatype *etype, MPI_Datatype *filetype, char *datarep) { NOT_IMPLEMENTED; }
 
