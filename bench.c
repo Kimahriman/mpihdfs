@@ -5,10 +5,11 @@
 #define MASTER 0
 static const long LIMIT=1048576;
 
-MPI_Offset read_file(const int size, const int rank, char * name, int block_size) {
+MPI_Offset read_file(const int size, const int rank, char * name, long block_size) {
 	int err, i;
-	double start_read, min_start_read, end_read, max_end_read, total_time;
+	double start_read, readtime, end_read, total_time;
 	char *chunk;
+	long mypart;
 	MPI_Offset file_size, read_size;
 	MPI_File in;
 
@@ -20,6 +21,7 @@ MPI_Offset read_file(const int size, const int rank, char * name, int block_size
 		MPI_Finalize();
 		exit(1);
 	}
+	mypart=file_size/size;
 
 	chunk = malloc(block_size * sizeof(char));
 
@@ -27,20 +29,20 @@ MPI_Offset read_file(const int size, const int rank, char * name, int block_size
 
 	start_read = MPI_Wtime();
 
-	for(i = rank; i < file_size/block_size; i += size){
+	for(i = rank; i < mypart/block_size; i++){
 		read_size = block_size;
-		if (i * block_size + block_size > file_size)
-			read_size = file_size - i * block_size;
-		MPI_File_read_at(in, i * block_size, chunk, read_size, MPI_CHAR, MPI_STATUS_IGNORE);
+	//	if (i * block_size + block_size > mypart)
+	//		read_size = file_size - i * block_size;
+		MPI_File_read_at(in, rank*mypart+i * block_size, chunk, read_size, MPI_CHAR, MPI_STATUS_IGNORE);
 	}
 
+	MPI_Barrier(MPI_COMM_WORLD);
 	end_read = MPI_Wtime();
+	readtime=end_read-start_read;
 	
-	MPI_Reduce(&start_read, &min_start_read, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-	MPI_Reduce(&end_read, &max_end_read, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+	MPI_Reduce(&readtime, &total_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
 	if (rank == MASTER) {
-		total_time = max_end_read - min_start_read;
 		printf("Time for whole read: %.2lf secs.\n", total_time);
 		printf("Total size: %lu bytes.\n", (unsigned long)file_size);
 		printf("Bandwidth: %.21f MB/s.\n", file_size / (1024*1024) / total_time);
@@ -51,7 +53,7 @@ MPI_Offset read_file(const int size, const int rank, char * name, int block_size
 }
 
 int main(int argc, char * argv[]) {
-	int size, rank, block_size;
+	int size, rank; long block_size;
 	int namelen;
 	double start=0.0, end;
 	char processor_name[MPI_MAX_PROCESSOR_NAME];
@@ -66,7 +68,7 @@ int main(int argc, char * argv[]) {
 			rank, size, processor_name);
 	fflush(stdout);
 
-	block_size = atoi(argv[2]);
+	block_size = atol(argv[2]);
 
 	if (rank == MASTER)
 		start=MPI_Wtime();
