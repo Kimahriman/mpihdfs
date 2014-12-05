@@ -7,5 +7,6 @@
 *.bbl
 *.blg
 *.txt
+*.pdf
 .*
 !.gitignore

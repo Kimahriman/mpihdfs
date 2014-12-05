@@ -50,7 +50,7 @@ endif
 
 clean:
 	$(RM) $(TARGET).ps $(TARGET).pdf $(TARGET).log $(TARGET).aux \
-	      $(TARGET).dvi $(TARGET).tex.flc
+	      $(TARGET).dvi $(TARGET).tex.flc $(TARGET).synctex.gz
 	$(RM) $(TARGET).bbl $(TARGET).blg
 	$(RM) *.kill kill*
 ifeq ($(DOPLOT),yes)

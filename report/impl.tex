@@ -1,1 +1,32 @@
 \section{Design and Implementation}
+Our goal was to provide a convenient solution for interacting with HDFS through MPI. Our solutions allows unmodified MPI programs to access HDFS. This is done by wrapping all calls to MPI I/O functions and modifying them to interact with HDFS instead of a locally mounted file system. Our wrapping code interacts with HDFS through the HDFS native library. This sections describes the native library, and how we use it in our wrapped MPI function calls to enable this seamless integration.
+
+\subsection{HDFS Native Library}
+The HDFS native library is included in the Hadoop distribution. It can typically be found at \texttt{HADOOP\_HOME/lib/native}, with the static version \texttt{libhdfs.a} and shared version \texttt{libhdfs.so}. The associated header file is found at \texttt{HADOOP\_HOME/include/hdfs.h}. These native libraries allow native code to interact with a running HDFS. This is perfect for interacting with MPI frameworks intended for use in C or C++ programs. Many popular MPI frameworks, such as MPICH~\cite{mpich} and OpenMPI~\cite{openmpi} are designed for use with this native code. We have chosen to implement our approach using MPICH due to [reason and source?]. Table \ref{table:libhdfs} lists the important functions of the HDFS native library needed to map MPI file operations onto HDFS.
+
+
+\begin{table}[ht]
+\caption{Key HDFS Native Functions}
+{\ttfamily
+\begin{tabular}{l}
+\hline\hline
+hdfsFS hdfsConnect(const char* nn, tPort port); \\
+int hdfsDisconnect(hdfsFS fs); \\
+hdfsFile hdfsOpenFile(hdfsFS fs, const char* path, int flags,
+                          int bufferSize, short replication, tSize blocksize); \\
+int hdfsCloseFile(hdfsFS fs, hdfsFile file); \\
+int hdfsSeek(hdfsFS fs, hdfsFile file, tOffset desiredPos); \\
+tOffset hdfsTell(hdfsFS fs, hdfsFile file); \\
+tSize hdfsRead(hdfsFS fs, hdfsFile file, void* buffer, tSize length); \\
+tSize hdfsPread(hdfsFS fs, hdfsFile file, tOffset position,
+                    void* buffer, tSize length); \\
+tSize hdfsWrite(hdfsFS fs, hdfsFile file, const void* buffer,
+                    tSize length); \\
+\hline\hline
+\end{tabular}
+}
+\label{table:libhdfs}
+\end{table}
+					
+
+We have designed a solution for allowing unmodified MPI programs to access files stored in HDFS. To do this, we wrap all calls to MPI I/O functions and modify their behavior as needed. 
