@@ -7,7 +7,7 @@ static const long LIMIT=1048576;
 
 MPI_Offset read_file(const int size, const int rank, char * name, int block_size) {
 	int err, i;
-	double start_read, min_start_read, end_read, max_end_read, total_time;
+	double start_read, readtime, end_read, total_time;
 	char *chunk;
 	MPI_Offset file_size, read_size;
 	MPI_File in;
@@ -35,12 +35,11 @@ MPI_Offset read_file(const int size, const int rank, char * name, int block_size
 	}
 
 	end_read = MPI_Wtime();
+	readtime=end_read-start_read;
 	
-	MPI_Reduce(&start_read, &min_start_read, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-	MPI_Reduce(&end_read, &max_end_read, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+	MPI_Reduce(&readtime, &total_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
 	if (rank == MASTER) {
-		total_time = max_end_read - min_start_read;
 		printf("Time for whole read: %.2lf secs.\n", total_time);
 		printf("Total size: %lu bytes.\n", (unsigned long)file_size);
 		printf("Bandwidth: %.21f MB/s.\n", file_size / (1024*1024) / total_time);
