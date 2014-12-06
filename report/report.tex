@@ -32,65 +32,6 @@ Adam Binford (adamq)
 \input{experiment}
 \input{concl}
 
-\section{Project Progress}
-We have finished investigating the possible ways to mount HDFS as a regular
-file system that can be interacted with by any file I/O. 
-We got the throughput for manual copy, native NFS as the ideal performance,
-fuse-dfs throughput for parallel read. However we could not perform parallel
-write using fuse-dfs. Table~\ref{tab:write} shows the errors we encountered during our
-tries. We tried using {\tt MPI\_File\_write\_at} where each process holds an
-individual file pointer, as well as {\tt MPI\_File\_write\_shared} where all
-processes hold a shared file pointer. We open the file using different mode and
-with the combinations we get mainly two errors. The error we get from the {\tt
-APPEND} mode is reported in the MPI program side, others are shown in the
-fuse-dfs side. Another method that we explored is Native HDFS Fuse~\cite{native},
-which utilizes only protobuf to communicate with Namenode directly. Hence no
-fuse or native lib is involved. However, the program dumped a segmentation fault
-when we tried to run. HDFS-NFS solution is also not successful nor
-desirable because either it has requirements for specific (2.3.0) Hadoop
-version~\cite{nfs} or it only supports the cloudera distribution of
-Hadoop~\cite{proxy}.
-
-
-We are now focusing on creating a library to 
-hook MPI~\cite{mpich} I/O function calls to use the HDFS native library to interact with
-HDFS. Our goal is to allow 
-unmodified MPI applications to interact with HDFS by simply loading our library
-at runtime. 
-So far we have successfully hooked MPI functions at runtime, and verified our
-functions were being 
-called. Additionally, we have read from and written to files in our running HDFS
-using the HDFS native 
-library. When reading a single file from multiple processes, we have observed an
-increase in bandwidth 
-when increasing processes. This confirms that multiple processes can read from the
-same file at once using 
-the native library. To complement this work, we have developed scripts to
-compile and run these HDFS 
-native library applications easily.
-
-\section{Future work}
-The final steps we have to do are implementing the necessary MPI I/O functions
-in our hooking library to 
-use the HDFS native library as the file I/O method. We have already done each of
-these pieces 
-individually, hooking and using the native library, we simply must combine them.
-The hooking functions 
-need to be able to use the parameters they are given to seamlessly work with
-HDFS without the MPI 
-program knowing anything is different. 
-
-Additionally, we must find out if it is possible to implement some support for
-writing to HDFS through 
-the hooked MPI routines. The native library only allows appending to a file, and
-only one thread can 
-access a file for writing at one time. We must either modify the behavior of the
-I/O of the MPI program 
-or set restrictions on what MPI programs running on HDFS are allowed to do.
-Finally, we must simplify 
-the scripts required for our solution to work to put as small of a burden on the
-user as possible.
-
 \begin{table}[t]
 	\centering
 	\small
