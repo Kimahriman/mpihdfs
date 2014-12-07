@@ -1,17 +1,19 @@
 \section{Introduction}
 MapReduce~\cite{mr} and its most popular implementation Hadoop~\cite{hadoop}
 have become the dominant distributed processing framework for big data
-analytics. Despite of the ease-of-use and scalibility of Hadoop, researchers
-found the limitations of MapReduce framework such as lack of inter-process
-communication and poor performance on handling iterative computations.  For
-example, X. Lu et al~\cite{xlu} find that the message latency of MPI is about
-100 times less than Hadoop primitives. The average peak bandwidth of MPI is
+analytics. In contrast to the ease-of-use and scalibility of Hadoop, researchers
+have found limitations of the MapReduce framework such as a lack of inter-process
+communication and poor performance on handling iterative computations. For
+example, X. Lu et al~\cite{xlu} find{\color{red} if you're talking about a past paper,
+wouldn't you use past tense?} that the message latency of MPI is about
+100 times less than Hadoop primitives. Additionally, the average peak bandwidth of MPI is
 about 100 times higher than Hadoop RPC -- the fundamental communication
-mechanism in Hadoop.  For such limitations, the well established Message Passing
+mechanism in Hadoop. Clearly, for communication intensive applications, the well established Message Passing
 Interface (MPI)~\cite{mpi2012} is more suitable due to its ability to support
-any communication pattern. 
- Moreover, there exists data analytics workflows such as
-Metagenomics~\cite{meta} that consist both compute- and communication-intensive
+any communication pattern.
+ 
+Moreover, there exists data analytics workflows such as
+Metagenomics~\cite{meta} that consist of both compute- and communication-intensive
 computations. To better conduct such workflows and to avoid data
 movement between clusters~\cite{catch}, resource coordination platforms such as
 Mesos~\cite{mesos}, Omega~\cite{omega}, YARN~\cite{yarn2013} enable different
@@ -29,19 +31,19 @@ these file systems are focused on optimization for MPI-IO~\cite{mpipvfs,
 mpilustre1, mpigpfs} and have a big network overhead on hosting Hadoop with the
 absence of data locality~\cite{hadooplustre}. IBM's GPFS is originally designed
 as a SAN file system. The data is striped and placed in a round-robin
-fashion~\cite{gpfs}, which prevents it from being used in Hadoop. With a support
-of File Placement Optimization (FPO), GPFS-FPO makes it possible to efficiently
+fashion~\cite{gpfs}, which prevents it from being used in Hadoop. With support
+for File Placement Optimization (FPO), GPFS-FPO makes it possible to efficiently
 support Hadoop.  However, GPFS is shipped with IBM SP system and is not
-available as opensource as Lustre. Moreover, IBM tailors MPI-IO according to
+available as open source like Lustre. Moreover, IBM tailors MPI-IO according to
 GPFS in their own MPI implementation~\cite{mpigpfs}, which is not supported in
 more wildly used implementations such as MPICH~\cite{mpich} and
 OpenMPI~\cite{openmpi}.
 
 Another solution is to support MPI-IO on top of the distributed file systems
 used by MapReduce such as GFS~\cite{gfs} and HDFS~\cite{hdfs}. HDFS is integrated
-inherently in Hadoop releases and is the default file system used in Hadoop
+inherently in Hadoop releases and is the default file system used in the Hadoop
 community. By bringing MPI to HDFS, it is possible to keep existing applications
-in Hadoop ecosystem without any changes. C. Cranor et al~\cite{CMU-PDL-12-115} explore the
+in Hadoop ecosystem without any changes. C. Cranor et al~\cite{CMU-PDL-12-115} explores the
 performance of MPI-IO on HDFS using PLFS. However, HDFS is supported as a
 component of PLFS and no data locality is achieved for MPI jobs. As far as we
 know, there is no such work on supporting MPI on top of HDFS directly. This
@@ -49,12 +51,12 @@ project focuses on exploring the feasibility and performance of enabling MPI-IO
 on top of HDFS using existing technologies. This study is based on the
 observation that MPI-IO provides great flexibility that it is possible for users
 to decide the process-to-block mapping, which gives a big potential that an
-optimized allocation can be decided. In this work, we explore and evaluate
+optimized allocation can be decided {\color{red} I don't understand what this is saying}. In this work, we explore and evaluate
 the existing methods including FuseDFS~\cite{fuse}, Native Library~\cite{lib},
-HDFS-NFS-Proxy~\cite{proxy} mainly on whether they support MPI-IO or not and how
+HDFS-NFS-Proxy~\cite{proxy} mainly on whether they support MPI-IO and how
 they perform. Furthermore, We design and develop
 {\proj}, an extension to current MPI-IO that supports direct access to HDFS for
-MPI applications. {\proj} uses the native library provided by HDFS and provides
+MPI applications. {\proj} uses the native library provided by HDFS and provides a
 seamless user experience. In order to evaluate the performance, we also
 developed a MPI-IO benchmark that reports read and write bandwidth. This report
 reflects the difficulties we encountered, whether each method can be adopted by
@@ -75,8 +77,8 @@ More specifically, our contribution in this study is as follows:
 	we perform a thorough performance study on {\proj} and the existing methods.
 \end{itemize}
 
-During our study and development, we encounter several
-challenges including ones that are still not solved yet.
+During our study and development, we encountered several
+challenges including ones that remain to be solved.
 \begin{itemize}
 \item Existing methods such as FuseDFS and HDFS-NFS-Proxy are originally designed to ease the file
 	maintenance instead of parallel file accessing, thus only sequential
@@ -93,7 +95,10 @@ challenges including ones that are still not solved yet.
 	the user needs to provide is the HFDS URL to locate the file
 	(Section~\ref{sec:impl}).
 \item During our development, we found that HDFS does not support 
-{\color{red} what writes? parallel writes? please describe here. }
+	parallel or positional writes. The HDFS native library provides many
+	checks to ensure this cannot happen. While emulating this behavior
+	using backend should be possible, we consider this a whole topic of
+	research on its own.
 \item HDFS is an append-only file system, while sometimes MPI jobs want to
 	modify the data in the file. To achieve that, one must rewrite the
 	entire file and replace the old file. This can cause a huge overhead on

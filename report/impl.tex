@@ -19,15 +19,15 @@
 
 \section{Design and Implementation}
 \label{sec:impl}
-Different from the other solutions that focus on file maintenance, our goal was
-{\color{red} why using past tense?} to provide a convenient solution only for
-interacting with HDFS through MPI. Hence, we do not need other layers such as
+Different from the other solutions that focus on file maintenance, our goal is
+to provide a convenient solution only for
+interacting with HDFS through MPI. Hence, we do not want to require other layers such as
 Fuse and NFS for file access. {\color{red} we also need to discuss why we give up
 POSIX compliance somewhere, I don't know the best place to put, so I just put it
-here, you can move it based on your context.} MPI-IO follows POSIX standard
-while HDFS is not POSIX compliant. However, our observation suggests that POSIX
-compliance is not the goal of MPI-IO design and most of the times is not
-necessary based on our experience. Certain POSIX compliant methods such as
+here, you can move it based on your context.} MPI-IO follows the POSIX standard
+while HDFS is not POSIX compliant. However, our observations suggest that POSIX
+compliance is not the goal of MPI-IO design and most of the time is not
+necessary. Certain POSIX compliant methods such as
 FuseDFS cannot support MPI parallel writes either because of the fundamental
 nature of HDFS. Therefore, in our design, we take the POSIX compliance out of
 consideration. Instead, we use HDFS URL to define an HDFS file. This approach
@@ -35,10 +35,10 @@ also gives {\proj} flexibility to decide when the native MPI-IO functions should
 be invoked. {\color{red} we need to say more about design, like the ease-of-use
 is our goal, to achieve the goal we design it in this this way...}
 
-Our solution allows unmodified
-MPI programs to access HDFS.
-This is done by wrapping all calls to MPI-IO
-functions and modifying them to interact with HDFS instead of a locally mounted
+To achieve our goal of ease-of-use, we have implemented a solution that allows unmodified
+MPI programs to access HDFS. This is done through our library, {\proj}, that
+wraps all calls to MPI-IO
+functions and modifies them to interact with HDFS instead of a locally mounted
 file system. Our wrapping code interacts with HDFS through the HDFS native
 library. This sections describes the native library, its limitations, and how we
 use it in our wrapped MPI function calls to enable this seamless integration.
@@ -60,23 +60,22 @@ lists the important function prototypes of the HDFS native library needed to map
 MPI file operations onto HDFS.
 
 \begin{table}[ht]
-\caption{Key HDFS Native Functions}
+\caption{Key HDFS Native Functions and their MPI Equivalents}
 {\ttfamily
-\begin{tabular}{l}
-\hline\hline
-hdfsFS hdfsConnect(const char* nn, tPort port); \\
-int hdfsDisconnect(hdfsFS fs); \\
-hdfsFile hdfsOpenFile(hdfsFS fs, const char* path, int flags,
-                          int bufferSize, short replication, tSize blocksize); \\
-int hdfsCloseFile(hdfsFS fs, hdfsFile file); \\
-int hdfsSeek(hdfsFS fs, hdfsFile file, tOffset desiredPos); \\
-tOffset hdfsTell(hdfsFS fs, hdfsFile file); \\
-tSize hdfsRead(hdfsFS fs, hdfsFile file, void* buffer, tSize length); \\
-tSize hdfsPread(hdfsFS fs, hdfsFile file, tOffset position,
-                    void* buffer, tSize length); \\
-tSize hdfsWrite(hdfsFS fs, hdfsFile file, const void* buffer,
-                    tSize length); \\
-\hline\hline
+\begin{tabular}{l l}
+\hline
+HDFS Native Library & MPI I/O \\
+\hline
+hdfsFS hdfsConnect(...) & \\
+hdfsDisconnect(hdfsFS fs) & \\
+hdfsFile hdfsOpenFile(hdfsFS fs, ...) & MPI\_File\_open(..., MPI\_File *fh) \\
+hdfsCloseFile(hdfsFS fs, hdfsFile file) & MPI\_File\_close(MPI\_File *fh) \\
+hdfsSeek(hdfsFS fs, hdfsFile file, ...) & MPI\_File\_seek(MPI\_File fh, ...)\\
+hdfsTell(hdfsFS fs, hdfsFile file) & MPI\_File\_get\_position(MPI\_File fh, ...)\\
+hdfsRead(hdfsFS fs, hdfsFile file, ...) & MPI\_File\_read(MPI\_File fh, ...)\\
+hdfsPread(hdfsFS fs, hdfsFile file, ...) & MPI\_File\_read\_at(MPI\_File fh, ...)\\
+hdfsWrite(hdfsFS fs, hdfsFile file, ...) & MPI\_File\_write(MPI\_File fh, ...)\\
+\hline
 \end{tabular}
 }
 \label{table:libhdfs}
@@ -103,7 +102,7 @@ An MPI program could perform these tasks using another file system API. If an
 HDFS file system is not specially mounted using one of the techniques mentioned
 earlier, clearly these operations would not work. An extension could be written
 that allows for simpler access to these attribute functions. This
-paper{\color{red} I was calling it a report..., or you can say our study} simply
+report simply
 focuses on the actual file reading and writing operations.
 
 \subsection{Limitations}
@@ -114,7 +113,7 @@ puts many restrictions in place to make sure this cannot be done. First, files
 can only be opened in either read-only mode or write-only mode. With the
 write-only mode, you have two additional options, create the file (and erase any
 previous file of this name) or append to an existing file. Second, while there
-is \texttt{hdfsPread}, clearly there is no \texttt{hdfsPwrite}. Finally,
+is \texttt{hdfsPread}, there is no \texttt{hdfsPwrite}. Finally,
 \texttt{hdfsSeek} can only be called on files opened in read-only mode.
 Obviously any \texttt{hdfsWrite} called on a read-only file will fail. We do not
 provide a ground-breaking solution to this issue, and instead provide limited
