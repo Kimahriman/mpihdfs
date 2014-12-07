@@ -37,20 +37,32 @@ While this library provides many simple and useful ways for interacting with an 
 \subsection{Hooking Library}
 Our goal was to provide an extremely simple approach to allowing HDFS access from MPI programs. We do not require MPI applications to be compiled in a certain way or with one of our provided libraries. Instead, we dynamically catch all MPI I/O function calls at runtime to modify their behavior. Very little effort is required on the part of the user. The provided script \texttt{mpihdfs.sh} simply needs to be used to initiate MPI programs. The arguments passed to the script should simply be the \texttt{mpiexec} or \texttt{mpirun} call that would normally be used. An example invocation would be \texttt{./mpihdfs.sh mpiexec -n 4 -machinefile machinefile ./MPIProgram}. This script simply requires location of three dynamic libraries: the native library that comes with standard Hadoop installations, \texttt{libhdfs.so}, a Java Virtual Machine library that comes with Java installations, \texttt{libjvm.so}, and our hooking library, \texttt{libmpihdfs.so}. This is all that a user must provide in order to start interacting with HDFS through their MPI programs. The typical location of these files are provided in the readme that comes with our distribution.
 
-The script allows our library to receive the MPI file calls by prioritizing our library over the actual MPI library during program startup. This is achieved using the \texttt{LD_PRELOAD} environment variable. More information about dynamic linking and library preloading can be found in \cite{ld.so}. In our library, we have defined our own version of every single MPI_File function, even those we have not implemented. Defining every function lets us ensure there is no mix up going between our version of MPI functions and the actual MPI functions. This ensures a cleaner failure if an unsupported function is envoked, rather than unpredictable behavior. 
+The script allows our library to receive the MPI file calls by prioritizing our
+library over the actual MPI library during program startup. This is achieved
+using the \texttt{LD\_PRELOAD} environment variable. More information about
+dynamic linking and library preloading can be found in \cite{ld.so}. In our
+library, we have defined our own version of every single MPI\_File function, even those we have not implemented. Defining every function lets us ensure there is no mix up going between our version of MPI functions and the actual MPI functions. This ensures a cleaner failure if an unsupported function is envoked, rather than unpredictable behavior. 
 
-Just as the HDFS native library functions operate on an \texttt{hdfsFile} object, MPI file operations operate on an \texttt{MPI_File} object, which is returned as an argument from \texttt{MPI_File_open}. The wrapper functions essentially hijack this \texttt{MPI_File} object to allow state to be stored between various calls to these wrapping functions. An \texttt{MPI_File} object is simply a \texttt{typedef}'d pointer to another file object, which allows our library to simply have this point to our own object instead of the actual MPI object. This is the reason unpredictable behavior would occur if the non-MPI object stored in the \texttt{MPI_File} pointer was passed to an actual MPI file function. Our wrapper file object is defined as follows:
+Just as the HDFS native library functions operate on an \texttt{hdfsFile}
+object, MPI file operations operate on an \texttt{MPI\_File} object, which is
+returned as an argument from \texttt{MPI\_File\_open}. The wrapper functions
+essentially hijack this \texttt{MPI\_File} object to allow state to be stored
+between various calls to these wrapping functions. An \texttt{MPI\_File} object
+is simply a \texttt{typedef}'d pointer to another file object, which allows our
+library to simply have this point to our own object instead of the actual MPI
+object. This is the reason unpredictable behavior would occur if the non-MPI
+object stored in the \texttt{MPI\_File} pointer was passed to an actual MPI file function. Our wrapper file object is defined as follows:
 
 {\ttfamily
 typedef struct
 {
-	int32_t magic;	// Indicates this is HDFS object
+	int32\_t magic;	// Indicates this is HDFS object
 	hdfsFS fs;	// HDFS file system object
 	hdfsFile file;	// HDFS file object
 	char *filename; // Name of file in HDFS
 	int mode;	// Mode for opening in HDFS
 	int amode;	// Mode for opening in MPI
-} hdfsFile_wrapper;
+} hdfsFile\_wrapper;
 }
 
 The \texttt{magic} field is what allows the various wrapper functions to recognize 
