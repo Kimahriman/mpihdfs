@@ -12,6 +12,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <dlfcn.h>
+#include <errno.h>
 
 #ifdef DEBUG
 #define status(str, ...) printf(str, ##__VA_ARGS__)

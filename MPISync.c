@@ -218,7 +218,7 @@ int MPI_File_write(MPI_File fh, MPIHDFS_CONST void *buf, int count, MPI_Datatype
 		return real_MPI_File_write(fh, buf, count, datatype, status);
 	}
 
-	status("HDFS file found in File_read_at.\n");
+	status("HDFS file found in File_write.\n");
 
 	if (fh_w->file != NULL || !(fh_w->amode & MPI_MODE_WRONLY)) {
 		fprintf(stderr, "Write called on a file not open for writing.\n");
@@ -226,16 +226,22 @@ int MPI_File_write(MPI_File fh, MPIHDFS_CONST void *buf, int count, MPI_Datatype
 	}
 
 	
-	if (!hdfsExists(fh_w->fs, fh_w->filename))
+	if (!hdfsExists(fh_w->fs, fh_w->filename)) {
+		status("Opening file in append mode.\n");
 		mode = O_WRONLY | O_APPEND;
-	else
+	}
+	else {
+		status("Opening file in create mode.\n");
 		mode = O_WRONLY;
+	}
 
 	fh_w->file = hdfsOpenFile(fh_w->fs, fh_w->filename, mode, 0, 0, 0);
 	if (!fh_w->file) {
 		fprintf(stderr, "Failed to open hdfs file for writing.\n");
 		return -1;
 	}	
+
+	status("Successfully opened hdfs file for writing.\n");
 
 #ifdef NO_MPI
 	size = 1;
@@ -249,7 +255,8 @@ int MPI_File_write(MPI_File fh, MPIHDFS_CONST void *buf, int count, MPI_Datatype
 		fprintf(stderr, "Failed to write to hdfs file.\n");
 
 	if (hdfsCloseFile(fh_w->fs, fh_w->file)) {
-		fprintf(stderr, "Failed to close file after hdfs write.\n");
+		fh_w->file = NULL;
+		fprintf(stderr, "Failed to close file after hdfs write. errno = %d\n", errno);
 		return MPI_ERR_FILE;
 	}
 	

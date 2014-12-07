@@ -143,20 +143,18 @@ int MPI_File_close(MPI_File *fh)
 
 	status("HDFS file found in File_close.\n");
 
+
 	if (fh_w->file) {
 		ret = hdfsCloseFile(fh_w->fs, fh_w->file);
-	
+
 		if (ret) {
 			fprintf(stderr, "Failed to close hdfs file.\n");
 			return MPI_ERR_FILE;
 		}
 	}
-
-	if (fh_w) {
-		if (fh_w->filename)
-			free(fh_w->filename);
-		free(fh_w);
-	}
+	if (fh_w->filename)
+		free(fh_w->filename);
+	free(fh_w);
 
 	status("File_close returning successfully.\n");
 
