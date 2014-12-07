@@ -60,7 +60,7 @@ challenges including ones that are still not solved yet.
 \item Existing methods such as FuseDFS and HDFS-NFS-Proxy are originally designed to ease the file
 	maintenance instead of parallel file accessing, thus only sequential
 	write operations are supported. Often failure is the case when we try to
-	perform parallel writes (Section~\ref{sec:}). 
+	perform parallel writes (Section~\ref{sec:exp}). 
 \item MPI-IO accesses underlying file systems using standard POSIX I/O system
 	calls, while HDFS is not designed to be a mountable POSIX file system
 	and must be accessed through its own API. The native library provided by
@@ -69,7 +69,7 @@ challenges including ones that are still not solved yet.
 	through the library. We develop a hook which enables MPI-IO to access
 	HDFS files using the native library transparently so that the only thing
 	the user needs to provide is the HFDS URL to locate the file
-	(Section~\ref{sec:}).
+	(Section~\ref{sec:impl}).
 \item During our development, we found that HDFS does not support 
 {\color{red} what writes? parallel writes? please describe here. }
 \item HDFS is an append-only file system, while sometimes MPI jobs want to
