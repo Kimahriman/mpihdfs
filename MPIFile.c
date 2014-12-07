@@ -7,7 +7,7 @@
 #define BUF_SIZE 4096
 
 /*
- * Opens a file for reading or writing. If the DEFAULT option is used, all
+ * Opens a file for reading or writing. If the ALL_HDFS option is used, all
  * files are assumed to be part of the default HDFS. Otherwise, file paths are
  * parsed to look for the hdfs:// prefix, and all other files simply interact
  * with the native MPI functions. Files to be opened for writing are not
@@ -18,7 +18,7 @@
 int MPI_File_open(MPI_Comm comm, MPIHDFS_CONST char *filename, int amode,
 		  MPI_Info info, MPI_File *fh)
 {
-#ifndef DEFAULT
+#ifndef ALL_HDFS
 	char fsname[BUF_SIZE];
 #endif
 	char hdfs_filename[BUF_SIZE];
@@ -33,7 +33,7 @@ int MPI_File_open(MPI_Comm comm, MPIHDFS_CONST char *filename, int amode,
 	if (!filename || !fh)
 		return MPI_ERR_ARG;
 
-#ifndef DEFAULT
+#ifndef ALL_HDFS
 	if (hdfs_url_parse(filename, fsname, BUF_SIZE, hdfs_filename, BUF_SIZE)) {
 		int (*real_MPI_File_open)(MPI_Comm, const char*, int, MPI_Info, MPI_File *) = NULL;
 		real_MPI_File_open = dlsym(RTLD_NEXT, "MPI_File_open");
@@ -72,7 +72,7 @@ int MPI_File_open(MPI_Comm comm, MPIHDFS_CONST char *filename, int amode,
 		return MPI_ERR_OTHER;
 	}
 
-#ifndef DEFAULT
+#ifndef ALL_HDFS
 	hdfsBuilderSetNameNode(builder, fsname);
 #else
 	hdfsBuilderSetNameNode(builder, "default");
@@ -168,7 +168,7 @@ int MPI_File_close(MPI_File *fh)
  */
 int MPI_File_delete(MPIHDFS_CONST char *filename, MPI_Info info)
 {
-#ifndef DEFAULT
+#ifndef ALL_HDFS
 	char fsname[BUF_SIZE];
 #endif
 	char hdfs_filename[BUF_SIZE];
@@ -180,7 +180,7 @@ int MPI_File_delete(MPIHDFS_CONST char *filename, MPI_Info info)
 	if (!filename)
 		return MPI_ERR_ARG;
 
-#ifndef DEFAULT
+#ifndef ALL_HDFS
 	if (hdfs_url_parse(filename, fsname, BUF_SIZE, hdfs_filename, BUF_SIZE)) {
 		int (*real_MPI_File_delete)(const char *, MPI_Info) = NULL;
 		real_MPI_File_delete = dlsym(RTLD_NEXT, "MPI_File_delete");
@@ -199,7 +199,7 @@ int MPI_File_delete(MPIHDFS_CONST char *filename, MPI_Info info)
 		return MPI_ERR_OTHER;
 	}
 
-#ifndef DEFAULT
+#ifndef ALL_HDFS
 	hdfsBuilderSetNameNode(builder, fsname);
 #else
 	hdfsBuilderSetNameNode(builder, "default");
