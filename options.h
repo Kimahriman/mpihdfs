@@ -2,11 +2,11 @@
 #define OPTIONS_H
 
 /*
- * The DEFAULT option does not parse the file path passed to MPI functions,
+ * The ALL_HDFS option does not parse the file path passed to MPI functions,
  * and assumes all MPI file interactions are with the default HDFS running
  * on the machine.
  */
-//#define DEFAULT
+//#define ALL_HDFS
 
 /*
  * The NO_MPI option forces the hooking functions to not call any other MPI
