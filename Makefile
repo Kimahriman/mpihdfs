@@ -21,8 +21,10 @@ hook: $(OBJS)
 test: clean-test MPITest.c
 	$(CC) MPITest.c -o MPITest
 
-bench: clean-bench bench.c
+bench: clean-bench bench.c writebench.c
 	$(CC) bench.c -o bench
+	$(CC) writebench.c -o writebench
+
 
 clean-main:
 	rm -f *.o MPIHook.so
@@ -31,6 +33,6 @@ clean-test:
 	rm -f MPITest
 
 clean-bench:
-	rm -f bench
+	rm -f bench writebench
 
 clean: clean-main clean-test clean-bench
