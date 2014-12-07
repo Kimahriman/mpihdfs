@@ -107,7 +107,6 @@ int MPI_File_open(MPI_Comm comm, MPIHDFS_CONST char *filename, int amode,
 
 	fh_w->fs = fs;
 	fh_w->file = file;
-	fh_w->mode = mode;
 	fh_w->amode = amode;
 	*fh = (MPI_File)fh_w;
 
