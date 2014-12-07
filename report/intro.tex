@@ -2,21 +2,22 @@
 MapReduce~\cite{mr} and its most popular implementation Hadoop~\cite{hadoop}
 have become the dominant distributed processing framework for big data
 analytics. Despite of the ease-of-use and scalibility of Hadoop, researchers
-also found the limitations of Hadoop lie in for example, inter-process
-communication. For such limitations, the well established Message Passing
-Interface (MPI)~\cite{mpi2012} is more suitable due to its ability to support any
-communication pattern. X. Lu et al~\cite{xlu} find that  the
-message latency of MPI is about 100 times less than Hadoop
-primitives. The average peak bandwidth of MPI is about
-100 times higher than Hadoop RPC -- the fundamental communication
-mechanism in Hadoop. Moreover, there exists data analytics workflows such as
+found the limitations of MapReduce framework such as lack of inter-process
+communication and poor performance on handling iterative computations.  For
+example, X. Lu et al~\cite{xlu} find that the message latency of MPI is about
+100 times less than Hadoop primitives. The average peak bandwidth of MPI is
+about 100 times higher than Hadoop RPC -- the fundamental communication
+mechanism in Hadoop.  For such limitations, the well established Message Passing
+Interface (MPI)~\cite{mpi2012} is more suitable due to its ability to support
+any communication pattern. 
+ Moreover, there exists data analytics workflows such as
 Metagenomics~\cite{meta} that consist both compute- and communication-intensive
 computations. To better conduct such workflows and to avoid data
 movement between clusters~\cite{catch}, resource coordination platforms such as
 Mesos~\cite{mesos}, Omega~\cite{omega}, YARN~\cite{yarn2013} enable different
 programming paradigms including MPI and MapReduce to co-exist in the same
 cluster. Though not realized yet, hosting MPI and Hadoop in the same cluster is
-highly promising as YARN claims to embrace MPI as a first class citizen.
+highly promising. For example, YARN claims to embrace MPI as a first class citizen.
 
 One of the biggest challenges of co-hosting MPI and Hadoop is to decide the
 underlying shared file system. As a big feature of MPI-2 standard~\cite{mpi2012},
@@ -27,7 +28,7 @@ Lustre~\cite{lustre}, GPFS~\cite{gpfs} to achieve the best performance. However,
 these file systems are focused on optimization for MPI-IO~\cite{mpipvfs,
 mpilustre1, mpigpfs} and have a big network overhead on hosting Hadoop with the
 absence of data locality~\cite{hadooplustre}. IBM's GPFS is originally designed
-as a SAN file system as the data is striped and placed in a round-robin
+as a SAN file system. The data is striped and placed in a round-robin
 fashion~\cite{gpfs}, which prevents it from being used in Hadoop. With a support
 of File Placement Optimization (FPO), GPFS-FPO makes it possible to efficiently
 support Hadoop.  However, GPFS is shipped with IBM SP system and is not
@@ -47,12 +48,32 @@ know, there is no such work on supporting MPI on top of HDFS directly. This
 project focuses on exploring the feasibility and performance of enabling MPI-IO
 on top of HDFS using existing technologies. This study is based on the
 observation that MPI-IO provides great flexibility that it is possible for users
-to decide the process-to-block mapping. In this work, we explore and evaluate
+to decide the process-to-block mapping, which gives a big potential that an
+optimized allocation can be decided. In this work, we explore and evaluate
 the existing methods including FuseDFS~\cite{fuse}, Native Library~\cite{lib},
-HDFS-NFS-Proxy~\cite{proxy}. We also develop our own MPI-IO hook using the
-native library provided by HDFS. In order to evaluate the performance, we also
-developed a MPI-IO benchmark. This report reflects the difficulties we
-encountered, whether each method can be adopted by MPI-IO, and how they perform. 
+HDFS-NFS-Proxy~\cite{proxy} mainly on whether they support MPI-IO or not and how
+they perform. Furthermore, We design and develop
+{\proj}, an extension to current MPI-IO that supports direct access to HDFS for
+MPI applications. {\proj} uses the native library provided by HDFS and provides
+seamless user experience. In order to evaluate the performance, we also
+developed a MPI-IO benchmark that reports read and write bandwidth. This report
+reflects the difficulties we encountered, whether each method can be adopted by
+MPI-IO, and how they perform. 
+
+More specifically, our contribution in this study is as follows:
+\begin{itemize}
+\item We did an MPI-IO support study of existing methods we are aware of. This
+	is the first study of directly support MPI-IO on top of HDFS as far as
+	we know.
+\item We design and implement {\proj}, an extension to MPI-IO that seamlessly
+	supports HDFS file read/write operations for MPI applications. 
+	(Section~\ref{sec:impl}).
+\item We identify the fundamental limitation of HDFS that prevents parallel
+	write operations. We discover this limitation in several methods that we
+	explore.
+\item We developed an MPI-IO benchmark that measures read/write bandwidth, and
+	we perform a thorough performance study on {\proj} and the existing methods.
+\end{itemize}
 
 During our study and development, we encounter several
 challenges including ones that are still not solved yet.
@@ -61,10 +82,11 @@ challenges including ones that are still not solved yet.
 	maintenance instead of parallel file accessing, thus only sequential
 	write operations are supported. Often failure is the case when we try to
 	perform parallel writes (Section~\ref{sec:exp}). 
-\item MPI-IO accesses underlying file systems using standard POSIX I/O system
+\item MPI-IO accesses underlying file systems using standard POSIX IO system
 	calls, while HDFS is not designed to be a mountable POSIX file system
 	and must be accessed through its own API. The native library provided by
-	HDFS gives a C/C++ compatible library that can be adopted for MPI files.
+	HDFS gives a C/C++ compatible library that can be adopted for MPI
+	applications.
 	However, MPI-IO does not have the corresponding support to access
 	through the library. We develop a hook which enables MPI-IO to access
 	HDFS files using the native library transparently so that the only thing
