@@ -1,5 +1,50 @@
 \section{Experiment}
 \label{sec:exp}
 
-In this section we compare the performance of the most adopted method by far, namely
-fuseDfs, with {\proj}. We also tried other options such as 
+In this section we compare the performance of the most adopted method by far,
+namely FuseDFS, with {\proj}. More specifically, by using our MPI-IO benchmark,
+we measure the performance by the bandwidth of parallel reads and sequential
+writes. Here we also display the errors we encountered when we perform parallel
+writes on fuseDFS. Our experiments are set up in a three-node HDFS cluster,
+where each node contains two Intel Quad-core Xeon E5462 $2.8~GHz$ processors,
+$12~MB$ L2 cache, $8~GB$ memory and one $320~GB$ Seagate ST3320820AS\_P SATA
+disk. Nodes are connected using $1~Gbps$ Ethernet. An NFS file system is mounted
+in each of the nodes. We use the latest MPICH
+version $3.1$ as our MPI implementation. Our benchmark {\color{red} say sth
+about benchmark?}
+
+\subsection{Read performance}
+Figure~\ref{fig:read1} shows the read bandwidths for local file access, NFS, {\proj},
+and FuseDFS. Here we configure HDFS to have one replica for each file block with
+the default block size (64MB). As we expected, the local file access achieves
+the best throughput compared with other three methods. However, other three
+methods don't make big difference but show most the same performance.
+Figure~\ref{fig:read2} shows the read bandwidths without local file access. We
+can see that {\proj} performs better than FuseDFS method, which is expected
+because {\proj} does not entail the overhead of Fuse. When there are small
+number of processes, {\proj} performs even better than NFS. However, after the
+number of processes reaches 6, NFS starts to perform better than {\proj}.
+
+\begin{figure}[t]
+\begin{minipage}{3in}
+\begin{center}
+\epsfig{figure=read1.eps, width=3in}
+\caption{\small Read bandwidth of Local file access, NFS, {\proj} and FuseDFS
+with the increase of process numbers.}
+\label{fig:read1}
+\vspace{-6pt}
+\end{center}
+\end{minipage}
+\hspace{0.02in}
+%\begin{figure}[t]
+\begin{minipage}{3in}
+\begin{center}
+\epsfig{figure=read2.eps, width=3in}
+\caption{\small Read bandwidth of NFS, {\proj} and FuseDFS
+with the increase of process numbers.}
+%The x-axis is the number of containers requested.}
+\label{fig:read2}
+\vspace{-6pt}
+\end{center}
+\end{minipage}
+\end{figure}
