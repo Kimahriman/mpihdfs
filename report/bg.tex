@@ -38,4 +38,7 @@ for HDFS for clients to use. However, the latest version of MPICH that
 we use only supports NFS3. Thus the solution is not suitable for MPI-IO. On the
 other hand, NFS Gateway is a Hadoop official effort that supports NFS3. However,
 it is claimed that file append is supported but random write is not supported.
-In our experiments we choose NFS Gateway to evaluate parallel reads.
+NFS Gateway requires to stop system
+critical service such as nfs and rpcbind. Since our testbed is in a public
+cluster, we could not evaluate this method here. However, we believe this method would
+not perform better than NFS, plus, it doesn't support random write either.
