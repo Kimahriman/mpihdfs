@@ -1,4 +1,4 @@
-\section{Experiment}
+\section{Experiments}
 \label{sec:exp}
 
 \begin{figure}[t]
@@ -58,8 +58,13 @@ where each node contains two Intel Quad-core Xeon E5462 $2.8~GHz$ processors,
 $12~MB$ L2 cache, $8~GB$ memory and one $320~GB$ Seagate ST3320820AS\_P SATA
 disk. Nodes are connected using $1~Gbps$ Ethernet. An NFS file system is mounted
 in each of the nodes. We use the latest MPICH
-version $3.1$ as our MPI implementation. Our benchmark {\color{red} say sth
-about benchmark?}
+version $3.1$ as our MPI implementation. Our benchmarks perform parallel reads
+and sequential writes of a single file. For reads, each process gets a proportional
+amount of the file to read, and the times measured are from when the first process
+starts reading to when the last process finishes reading. All of the processes run
+simultaneously, so MPI routines are used to determine the earliest starting time
+and the latest finishing time. For writing, just a single process is used to
+write a sequential file.
 
 \subsection{Read Performance}
 Figure~\ref{fig:read1} shows the read bandwidths for local file access, NFS, {\proj},
@@ -68,33 +73,33 @@ the default block size (64MB). To match with the default block size of HDFS, we
 also configure the benchmark with 64MB access block size so that each process
 access 64MB of data each time. Note that we only use two of the nodes to set up
 HDFS in this case. As we expected, the local file access achieves
-the best throughput compared with other three methods. However, other three
-methods don't make big difference but show most the same performance. The
+the best throughput compared with the other three methods. However, these other three
+methods show mostly the same performance. The
 difference between the local file access and the other methods are network
-connection. Both HDFS and NFS methods fetch data through the network connection.
+connection. Both HDFS and NFS methods fetch data over the network.
 
 To better compare the performance difference between HDFS methods and NFS. We
 take away the "Local" in the figure as shown in Figure~\ref{fig:read2}. We 
 can see that {\proj} performs better than FuseDFS method, which is expected
-because {\proj} does not entail the overhead of Fuse. The more interesting thing
+because {\proj} does not entail the overhead of FUSE. The more interesting thing
 here is the comparison between NFS and {\proj}. When there are small
 number of processes, {\proj} performs even better than NFS. However, after the
 number of processes reaches 6, NFS starts to perform better than {\proj}. We
 suspect the reason behind is because we have only one replica in each node, and
 the processors are located within the data node. With the same access block
-size, some how some processes achieved data locality. Thus avoids some of the
-network transferring. However, when the number of processes increases, the
+size, some how some processes achieved data locality, thus avoiding some of the
+network transfers. However, when the number of processes increases, the
 underlying number of nodes is not big enough to serve the locality needs. That
-causes the data transferring through the network.
+causes the data to transfer through the network.
 
 To verify what we expected, we conduct another experiment where we add a data
 node in the HDFS cluster and set the
-number of replicas into 3, and run the same benchmark. Figure~\ref{fig:read3}
+number of replicas to 3, and run the same benchmark. Figure~\ref{fig:read3}
 shows the results. We can see that this time not only {\proj} performs better
 than NFS, FuseDFS also performs better. This is because the number of replicas
 reaches 3 so that more processes can benefit from locality by reading data
 locally. Until we reach 9 processors, HDFS
-performs better than NFS. This is because that we add one more data node to
+performs better than NFS. This is because we add one more data node to
 serve more processes.
 
 
@@ -102,7 +107,7 @@ Figure~\ref{fig:read4} shows the performance of {\proj} and FuseDFS on HDFS
 configured with 3 replicas and 1 replica each. The results show that {\proj}
 with 3 replicas performs the best and FuseDFS with 1 replica performs worst,
 which are expected. {\proj} with 1 replica and FuseDFS with 3 replicas are not
-deterministic. Sometimes the overhead of Fuse is bigger than the overhead of
+deterministic. Sometimes the overhead of FUSE is bigger than the overhead of the
 network. Sometimes the opposite case is observed. 
 
 \subsection{Write Performance}
