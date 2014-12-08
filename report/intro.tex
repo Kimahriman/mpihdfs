@@ -4,8 +4,7 @@ have become the dominant distributed processing framework for big data
 analytics. In contrast to the ease-of-use and scalibility of Hadoop, researchers
 have found limitations of the MapReduce framework such as a lack of inter-process
 communication and poor performance on handling iterative computations. For
-example, X. Lu et al~\cite{xlu} find{\color{red} if you're talking about a past paper,
-wouldn't you use past tense?} that the message latency of MPI is about
+example, X. Lu et al~\cite{xlu} found that the message latency of MPI is about
 100 times less than Hadoop primitives. Additionally, the average peak bandwidth of MPI is
 about 100 times higher than Hadoop RPC -- the fundamental communication
 mechanism in Hadoop. Clearly, for communication intensive applications, the well established Message Passing
@@ -22,7 +21,7 @@ cluster. Though not realized yet, hosting MPI and Hadoop in the same cluster is
 highly promising. For example, YARN claims to embrace MPI as a first class citizen.
 
 One of the biggest challenges of co-hosting MPI and Hadoop is to decide the
-underlying shared file system. As a big feature of MPI-2 standard~\cite{mpi2012},
+underlying shared file system. As a big feature of the MPI-2 standard~\cite{mpi2012},
 MPI-IO provides parallel IO support to MPI programs and enables MPI to process
 data-intensive workloads as well. Currently, such support requires an underlying
 network/parallel file system such as NFS~\cite{nfs1}, PVFS~\cite{pvfs},
@@ -73,7 +72,7 @@ More specifically, our contribution in this study is as follows:
 \item We identify the fundamental limitation of HDFS that prevents parallel
 	write operations. We discover this limitation in several methods that we
 	explore (Section~\ref{sec:impl}).
-\item We developed an MPI-IO benchmark that measures read/write bandwidth, and
+\item We develop an MPI-IO benchmark that measures read/write bandwidth, and
 	we perform a thorough performance study on {\proj} and the existing
 	methods (Section~\ref{sec:exp}).
 \end{itemize}
@@ -81,7 +80,7 @@ More specifically, our contribution in this study is as follows:
 During our study and development, we encountered several
 challenges including ones that remain to be solved.
 \begin{itemize}
-\item Existing methods such as FuseDFS and HDFS-NFS-Proxy are originally designed to ease the file
+\item Existing methods such as FuseDFS and HDFS-NFS-Proxy are designed to provide ease of
 	maintenance instead of parallel file accessing, thus only sequential
 	write operations are supported. Often failure is the case when we try to
 	perform parallel writes (Section~\ref{sec:exp}). 
@@ -98,7 +97,7 @@ challenges including ones that remain to be solved.
 \item During our development, we found that HDFS does not support 
 	parallel or positional writes. The HDFS native library provides many
 	checks to ensure this cannot happen. While emulating this behavior
-	using backend should be possible, we consider this a whole topic of
+	using backend logic should be possible, we consider this a whole topic of
 	research on its own.
 \item HDFS is an append-only file system, while sometimes MPI jobs want to
 	modify the data in the file. To achieve that, one must rewrite the

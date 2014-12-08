@@ -22,22 +22,21 @@
 Different from the other solutions that focus on file maintenance, our goal is
 to provide a convenient solution only for
 interacting with HDFS through MPI. Hence, we do not want to require other layers such as
-Fuse and NFS for file access. {\color{red} we also need to discuss why we give up
-POSIX compliance somewhere, I don't know the best place to put, so I just put it
-here, you can move it based on your context.} MPI-IO follows the POSIX standard
-while HDFS is not POSIX compliant. However, our observations suggest that POSIX
+Fuse and NFS for file access. These projects attempt to create a POSIX compliant interface
+for interacting with HDFS. However, our observations suggest that POSIX
 compliance is not the goal of MPI-IO design and most of the time is not
-necessary. Certain POSIX compliant methods such as
+necessary. HDFS inherently does not support all POSIX requirements, such as random writes. 
 FuseDFS cannot support MPI parallel writes either because of the fundamental
 nature of HDFS. Therefore, in our design, we take the POSIX compliance out of
-consideration. Instead, we use HDFS URL to define an HDFS file. This approach
+consideration. Instead, we implement the features available to HDFS, and give
+users the option to interact with HDFS and other mounted file systems simultaneously through
+MPI functions. This approach
 also gives {\proj} flexibility to decide when the native MPI-IO functions should
-be invoked. {\color{red} we need to say more about design, like the ease-of-use
-is our goal, to achieve the goal we design it in this this way...}
+be invoked. 
 
 To achieve our goal of ease-of-use, we have implemented a solution that allows unmodified
-MPI programs to access HDFS. This is done through our library, {\proj}, that
-wraps all calls to MPI-IO
+MPI programs to access HDFS directly, without the use of an intermediate mounting location. 
+This is done through our library, {\proj}, that wraps all calls to MPI-IO
 functions and modifies them to interact with HDFS instead of a locally mounted
 file system. Our wrapping code interacts with HDFS through the HDFS native
 library. This sections describes the native library, its limitations, and how we
@@ -48,16 +47,12 @@ The HDFS native library is included in the Hadoop distribution. It can typically
 be found at \texttt{\$HADOOP\_HOME/lib/native}, with the static version
 \texttt{libhdfs.a} and shared version \texttt{libhdfs.so}. The associated header
 file is found at \texttt{\$HADOOP\_HOME/include/hdfs.h}. These native libraries
-allow native code, namely C/C++ codes, to interact with a running HDFS. This is perfect for
+allow native code, namely C/C++ codes, to interact with a running HDFS file system. This is perfect for
 {\proj} because most popular implementations of MPI~\cite{mpich, openmpi} are written in C and most
 MPI applications are developed in C/C++. In our prototype, we choose to use
 MPICH as the MPI implementation due to our earlier experience with it.
-Table \ref{table:libhdfs} {\color{red} table are too long, we can omit some
-parameters by using "..." in the middle, and add some description to the
-function name, make it two column. Also you can add a table in the section where
-you show what MPI-IO standard functions you re-implemented. }
-lists the important function prototypes of the HDFS native library needed to map
-MPI file operations onto HDFS.
+Table \ref{table:libhdfs} lists the important function prototypes of the HDFS native library needed to map
+MPI file operations onto HDFS, and their corresponding MPI-IO function.
 
 \begin{table*}[ht]
 \center
@@ -83,10 +78,10 @@ hdfsWrite(hdfsFS fs, hdfsFile file, ...) & MPI\_File\_write(MPI\_File fh, ...)\\
 \end{table*}
 					
 \texttt{hdfsConnect} creates the initial connection to a running HDFS file
-system, and requires URL and port number. It returns an \texttt{hdfsFS} object
+system, and requires the URL and port number of the Namenode. It returns an \texttt{hdfsFS} object
 that is required in all file operations to interact with any file from that file
 system. \texttt{hdfsDisconnect} ends this created connection.
-\texttt{hdfsOpenFile} returns a handle to an file on a particular file system,
+\texttt{hdfsOpenFile} returns a handle to a file on a particular file system,
 either opening the file for reading or writing. This handle is a
 \texttt{hdfsFile} object that is required, in addition to the \texttt{hdfsFS}
 object, for all file operations. The remaining functions behave as expected in
@@ -119,23 +114,23 @@ is \texttt{hdfsPread}, there is no \texttt{hdfsPwrite}. Finally,
 Obviously any \texttt{hdfsWrite} called on a read-only file will fail. We do not
 provide a ground-breaking solution to this issue, and instead provide limited
 write support back to HDFS, as well as the ability to interact with with HDFS
-and a non-HDFS file system simultaneously with only the MPI I/O API. With this,
+and a non-HDFS file system simultaneously with only the MPI-IO API. With this,
 if users are unable to work with the limited writing facilities, they can write
 normally to another file system, possibly copying the data back to HDFS later if
 necessary.
 
 \subsection{Hooking Library}
-Our goal was to provide an extremely simple approach to allowing HDFS access
+Our goal was to provide an extremely simple approach to allow HDFS access
 from MPI programs. We do not require MPI applications to be compiled in a
 certain way or with one of our provided libraries. Instead, we dynamically catch
-all MPI I/O function calls at runtime to modify their behavior. Very little
+all MPI-IO function calls at runtime to modify their behavior. Very little
 effort is required on the part of the user. The provided script
 \texttt{mpihdfs.sh} simply needs to be used to initiate MPI programs. The
 arguments passed to the script should simply be the \texttt{mpiexec} or
 \texttt{mpirun} call that would normally be used. An example invocation would be
 \texttt{./mpihdfs.sh mpiexec -n 4 -machinefile machinefile ./MPIProgram}. This
-script simply requires location of three dynamic libraries: the native library
-that comes with standard Hadoop installations, \texttt{libhdfs.so}, a Java
+script simply requires the location of three dynamic libraries: the native library
+that comes with standard Hadoop installations, \texttt{libhdfs.so}, the Java
 Virtual Machine library that comes with Java installations, \texttt{libjvm.so},
 and our hooking library, \texttt{libmpihdfs.so}. This is all that a user must
 provide in order to start interacting with HDFS through their MPI programs. The
@@ -157,7 +152,7 @@ object, MPI file operations operate on an \texttt{MPI\_File} object, which is
 returned as an argument from \texttt{MPI\_File\_open}. The wrapper functions
 essentially hijack this \texttt{MPI\_File} object to allow state to be stored
 between various calls to these wrapping functions. An \texttt{MPI\_File} object
-is simply a pointer to another file object, which allows our library to simply
+is simply a pointer to another file object, which allows our library to 
 have this point to our own object instead of the actual MPI object. This is the
 reason unpredictable behavior would occur if the non-MPI object stored in the
 \texttt{MPI\_File} pointer was passed to an actual MPI file function. Our
@@ -184,13 +179,13 @@ object, the native library only allows you to query this attribute using the
 file name. \texttt{amode} is stored specifically to implement the
 \texttt{MPI\_File\_get\_amode} function. All of these fields are set when the
 object is created in the \texttt{MPI\_File\_open} wrapper method. The following
-section describes the two different ways an MPI program can interact with HDFS.
+section describes the two different ways an MPI program can interact with HDFS using {\proj}.
 
 \subsection{Modes of Operation}
-Our library can be compiled in two different modes for various paradigms for
+{\proj} can be compiled in two different modes for various paradigms for
 interacting with HDFS. In the default mode of operation, the
 \texttt{MPI\_File\_open} wrapper function parses the URL given to it. If it is
-of the form hdfs://<HDFS NameNode host>:<port><file path>, then the
+of the form \texttt{hdfs://<HDFS NameNode host>:<port><file path>}, then the
 \texttt{hdfsFile\_wrapper} object is created and pointed to by the returned
 \texttt{MPI\_File} object, and all subsequent operations of this object in other
 MPI file functions will run our special HDFS code. If the URL does not match
@@ -198,11 +193,11 @@ this format, then the \texttt{MPI\_File\_open} call passes control to the actual
 MPI function, and all subsequent operations on the returned \texttt{MPI\_File}
 object will pass control to the actual MPI functions. 
 
-The other mode of operation is specified by defining \texttt{ALL\_HDFS} macro.
+The other mode of operation is specified by defining the \texttt{ALL\_HDFS} macro during compilation.
 With this, all MPI file functions are assumed to be directed to the default HDFS
 instance running. This is determined automatically by the HDFS native library by
 examining the Hadoop configuration files on the local machine to determine the
-host and port number of the default NameNode. With this, nothing but the actual
+host and port number of the default Namenode. With this, nothing but the actual
 file path must be specified in the \texttt{MPI\_File\_open} calls. 
 
 The latter mode can be beneficial if an MPI program will only be interacting
