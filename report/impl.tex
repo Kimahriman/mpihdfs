@@ -59,7 +59,8 @@ you show what MPI-IO standard functions you re-implemented. }
 lists the important function prototypes of the HDFS native library needed to map
 MPI file operations onto HDFS.
 
-\begin{table}[ht]
+\begin{table*}[ht]
+\center
 \caption{Key HDFS Native Functions and their MPI Equivalents}
 {\ttfamily
 \begin{tabular}{l l}
@@ -79,7 +80,7 @@ hdfsWrite(hdfsFS fs, hdfsFile file, ...) & MPI\_File\_write(MPI\_File fh, ...)\\
 \end{tabular}
 }
 \label{table:libhdfs}
-\end{table}
+\end{table*}
 					
 \texttt{hdfsConnect} creates the initial connection to a running HDFS file
 system, and requires URL and port number. It returns an \texttt{hdfsFS} object
