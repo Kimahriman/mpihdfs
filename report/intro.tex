@@ -64,17 +64,18 @@ MPI-IO, and how they perform.
 
 More specifically, our contribution in this study is as follows:
 \begin{itemize}
-\item We did an MPI-IO support study of existing methods we are aware of. This
+\item We perform an MPI-IO support study of existing methods we are aware of. This
 	is the first study of directly support MPI-IO on top of HDFS as far as
-	we know.
+	we know (Section~\ref{sec:bg}).
 \item We design and implement {\proj}, an extension to MPI-IO that seamlessly
-	supports HDFS file read/write operations for MPI applications. 
+	supports HDFS file read/write operations for MPI applications 
 	(Section~\ref{sec:impl}).
 \item We identify the fundamental limitation of HDFS that prevents parallel
 	write operations. We discover this limitation in several methods that we
-	explore.
+	explore (Section~\ref{sec:impl}).
 \item We developed an MPI-IO benchmark that measures read/write bandwidth, and
-	we perform a thorough performance study on {\proj} and the existing methods.
+	we perform a thorough performance study on {\proj} and the existing
+	methods (Section~\ref{sec:exp}).
 \end{itemize}
 
 During our study and development, we encountered several

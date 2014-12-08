@@ -1,30 +1,6 @@
 \section{Experiment}
 \label{sec:exp}
 
-In this section we compare the performance of the most adopted method by far,
-namely FuseDFS, with {\proj}. More specifically, by using our MPI-IO benchmark,
-we measure the performance by the bandwidth of parallel reads and sequential
-writes. Here we also display the errors we encountered when we perform parallel
-writes on fuseDFS. Our experiments are set up in a three-node HDFS cluster,
-where each node contains two Intel Quad-core Xeon E5462 $2.8~GHz$ processors,
-$12~MB$ L2 cache, $8~GB$ memory and one $320~GB$ Seagate ST3320820AS\_P SATA
-disk. Nodes are connected using $1~Gbps$ Ethernet. An NFS file system is mounted
-in each of the nodes. We use the latest MPICH
-version $3.1$ as our MPI implementation. Our benchmark {\color{red} say sth
-about benchmark?}
-
-\subsection{Read performance}
-Figure~\ref{fig:read1} shows the read bandwidths for local file access, NFS, {\proj},
-and FuseDFS. Here we configure HDFS to have one replica for each file block with
-the default block size (64MB). As we expected, the local file access achieves
-the best throughput compared with other three methods. However, other three
-methods don't make big difference but show most the same performance.
-Figure~\ref{fig:read2} shows the read bandwidths without local file access. We
-can see that {\proj} performs better than FuseDFS method, which is expected
-because {\proj} does not entail the overhead of Fuse. When there are small
-number of processes, {\proj} performs even better than NFS. However, after the
-number of processes reaches 6, NFS starts to perform better than {\proj}.
-
 \begin{figure}[t]
 \begin{minipage}{3in}
 \begin{center}
@@ -48,3 +24,85 @@ with the increase of process numbers.}
 \end{center}
 \end{minipage}
 \end{figure}
+
+\begin{figure}[t]
+\begin{minipage}{3in}
+\begin{center}
+\epsfig{figure=read3.eps, width=3in}
+\caption{\small Read bandwidth of NFS, {\proj} and FuseDFS on HDFS with 3
+replicas.}
+\label{fig:read3}
+\vspace{-6pt}
+\end{center}
+\end{minipage}
+\hspace{0.02in}
+%\begin{figure}[t]
+\begin{minipage}{3in}
+\begin{center}
+\epsfig{figure=read4.eps, width=3in}
+\caption{\small Read bandwidth of {\proj} and FuseDFS
+with 1 replica and 3 replicas respectively.}
+%The x-axis is the number of containers requested.}
+\label{fig:read4}
+\vspace{-6pt}
+\end{center}
+\end{minipage}
+\end{figure}
+
+In this section we compare the performance of the most adopted method by far,
+namely FuseDFS, with {\proj}. More specifically, by using our MPI-IO benchmark,
+we measure the performance by the bandwidth of parallel reads and sequential
+writes. Here we also display the errors we encountered when we perform parallel
+writes on FuseDFS. Our experiments are set up in a three-node HDFS cluster,
+where each node contains two Intel Quad-core Xeon E5462 $2.8~GHz$ processors,
+$12~MB$ L2 cache, $8~GB$ memory and one $320~GB$ Seagate ST3320820AS\_P SATA
+disk. Nodes are connected using $1~Gbps$ Ethernet. An NFS file system is mounted
+in each of the nodes. We use the latest MPICH
+version $3.1$ as our MPI implementation. Our benchmark {\color{red} say sth
+about benchmark?}
+
+\subsection{Read Performance}
+Figure~\ref{fig:read1} shows the read bandwidths for local file access, NFS, {\proj},
+and FuseDFS. Here we configure HDFS to have one replica for each file block with
+the default block size (64MB). To match with the default block size of HDFS, we
+also configure the benchmark with 64MB access block size so that each process
+access 64MB of data each time. Note that we only use two of the nodes to set up
+HDFS in this case. As we expected, the local file access achieves
+the best throughput compared with other three methods. However, other three
+methods don't make big difference but show most the same performance. The
+difference between the local file access and the other methods are network
+connection. Both HDFS and NFS methods fetch data through the network connection.
+
+To better compare the performance difference between HDFS methods and NFS. We
+take away the "Local" in the figure as shown in Figure~\ref{fig:read2}. We 
+can see that {\proj} performs better than FuseDFS method, which is expected
+because {\proj} does not entail the overhead of Fuse. The more interesting thing
+here is the comparison between NFS and {\proj}. When there are small
+number of processes, {\proj} performs even better than NFS. However, after the
+number of processes reaches 6, NFS starts to perform better than {\proj}. We
+suspect the reason behind is because we have only one replica in each node, and
+the processors are located within the data node. With the same access block
+size, some how some processes achieved data locality. Thus avoids some of the
+network transferring. However, when the number of processes increases, the
+underlying number of nodes is not big enough to serve the locality needs. That
+causes the data transferring through the network.
+
+To verify what we expected, we conduct another experiment where we add a data
+node in the HDFS cluster and set the
+number of replicas into 3, and run the same benchmark. Figure~\ref{fig:read3}
+shows the results. We can see that this time not only {\proj} performs better
+than NFS, FuseDFS also performs better. This is because the number of replicas
+reaches 3 so that more processes can benefit from locality by reading data
+locally. Until we reach 9 processors, HDFS
+performs better than NFS. This is because that we add one more data node to
+serve more processes.
+
+
+Figure~\ref{fig:read4} shows the performance of {\proj} and FuseDFS on HDFS
+configured with 3 replicas and 1 replica each. The results show that {\proj}
+with 3 replicas performs the best and FuseDFS with 1 replica performs worst,
+which are expected. {\proj} with 1 replica and FuseDFS with 3 replicas are not
+deterministic. Sometimes the overhead of Fuse is bigger than the overhead of
+network. Sometimes the opposite case is observed. 
+
+\subsection{Write Performance}
