@@ -13,7 +13,7 @@ debug: CFLAGS += -DDEBUG
 debug: all
 
 hook: $(OBJS)
-	$(CC) $(LDFLAGS) $(OBJS) -o MPIHook.so
+	$(CC) $(LDFLAGS) $(OBJS) -o libmpihdfs.so
 
 %.o: %.c
 	$(CC) $(CFLAGS) $<
