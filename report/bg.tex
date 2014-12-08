@@ -1,16 +1,17 @@
 \section{Existing Methods}
 \label{sec:bg}
-Hadoop community makes a lot of efforts~\cite{fuse} to ease the use of HDFS to
-facilitate regular file maintenance, for example, operations using standard Unix
+The Hadoop community makes a lot of effort~\cite{fuse} to ease the use of HDFS to
+facilitate regular file maintenance. For example, there are many tools to support
+operations using standard Unix
 utilities such as 'ls', 'cd', 'cp', 'mkdir', 'find', 'grep', or use standard
 POSIX libraries like open, write, read, close from C, C++, etc. Such efforts
-usually use HDFS library, RPC, protobuf and NFS proxy, and expose to users
+usually use the HDFS library, RPC, protobuf or NFS proxy, and are exposed to users
 through FUSE or NFS.
 
 Projects~\cite{fuse, hdfs-fuse, fuse-j} are built on FUSE. These projects enable
 HDFS to be mounted as a standard file system using the mount command. On the
-other side, these projects interact with HDFS using HDFS library, either native
-library or JAVA library. The problem with Hadoop Library is that it doesn't
+back end, these projects interact with HDFS using the HDFS library, either native
+library or Java library. The problem with the Hadoop Library is that it doesn't
 support random writes, thus all writes need to be sequential. This limitation
 prevents MPI parallel write operations to be implemented through the library.
 Here we choose
@@ -20,20 +21,20 @@ because of the limitation of the library, we can only evaluate parallel reads an
 sequential writes.
 
 Unlike
-these projects, projects such as native-hdfs-fuse~\cite{native} doesn't use
+these projects, projects such as native-hdfs-fuse~\cite{native} doesn't use the
 HDFS library or otherwise start a JVM - it constructs and sends the protocol buffer
 messages itself. This project also uses FUSE to interact with users. Another
 project Hadoofus~\cite{hadoofus} provides only a client library. It provides a C
 API for directly calling Namenode RPCs and performing Datanode block read and
 write operations, as well as a Hadoop Library compatible interface. Such methods
-avoid using the HDFS library by directly interact with Namenode using some
+avoid using the HDFS library by directly interact with a Namenode using some
 protocol. These methods support random file writes. However, the projects are
 not well maintained and they corrupt when we try to install them. Hence, we have
 no way to evaluate such protocol communication based methods.
 
 HDFS NFS Proxy~\cite{proxy} and NFS Gateway~\cite{nfs} are two representative
-NFS solutions. Both export HDFS as an NFS. The former creates an NFS4 for HDFS
-and other nodes can mount as a client. However, the latest version of MPICH that
+NFS solutions. Both export HDFS as an NFS. The former creates an NFS4 mount point
+for HDFS for clients to use. However, the latest version of MPICH that
 we use only supports NFS3. Thus the solution is not suitable for MPI-IO. On the
 other hand, NFS Gateway is a Hadoop official effort that supports NFS3. However,
 it is claimed that file append is supported but random write is not supported.
