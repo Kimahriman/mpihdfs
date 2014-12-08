@@ -1,7 +1,8 @@
 #include "MPIHook.h"
 
 /*
- * File operations that are not currently supported.
+ * File operations that are not currently supported. These functions are still wrapped
+ * to guard against any calls to actual MPI functions using our wrapped MPI_File object.
  */
 
 int MPI_File_iread(MPI_File fh, void *buf, int count, MPI_Datatype datatype, MPIO_Request *request)
@@ -349,23 +350,293 @@ int MPI_File_write_at_all_end(MPI_File fh, MPIHDFS_CONST void *buf, MPI_Status *
 	
 	NOT_IMPLEMENTED;
 }
-int MPI_File_read_all_begin(MPI_File, void *, int, MPI_Datatype);
-int MPI_File_read_all_end(MPI_File, void *, MPI_Status *);
-int MPI_File_write_all_begin(MPI_File, MPIHDFS_CONST void *, int, MPI_Datatype);
-int MPI_File_write_all_end(MPI_File, MPIHDFS_CONST void *, MPI_Status *);
-int MPI_File_read_ordered_begin(MPI_File, void *, int, MPI_Datatype);
-int MPI_File_read_ordered_end(MPI_File, void *, MPI_Status *);
-int MPI_File_write_ordered_begin(MPI_File, MPIHDFS_CONST void *, int, MPI_Datatype);
-int MPI_File_write_ordered_end(MPI_File, MPIHDFS_CONST void *, MPI_Status *);
+int MPI_File_read_all_begin(MPI_File fh, void *buf, int count, MPI_Datatype datatype)
+{
+	hdfsFile_wrapper *fh_w;
+	
+	if (!fh)
+		return MPI_ERR_ARG;
 
-int MPI_File_get_type_extent(MPI_File, MPI_Datatype, MPI_Aint *);
+	fh_w = (hdfsFile_wrapper*)fh;
 
-int MPI_Register_datarep(MPIHDFS_CONST char *,
-			 MPI_Datarep_conversion_function *,
-			 MPI_Datarep_conversion_function *,
-			 MPI_Datarep_extent_function *,
-			 void *);
+	if (fh_w->magic != HDFSFILEMAGIC)
+	{
+		int (*real_MPI_File_read_all_begin)(MPI_File, void *, int, MPI_Datatype) = NULL;
+		real_MPI_File_read_all_begin = dlsym(RTLD_NEXT, "MPI_File_read_all_begin");
+		if (!real_MPI_File_read_all_begin) {
+			fprintf(stderr, "Failed to load actual MPI_File_read_all_begin location.\n");
+			return MPI_ERR_OTHER;
+		}
 
-int MPI_File_set_atomicity(MPI_File, int);
-int MPI_File_get_atomicity(MPI_File, int *);
-int MPI_File_sync(MPI_File);
+		status("Passing File_read_all_begin to actual MPI function.\n");
+		return real_MPI_File_read_all_begin(fh, buf, count, datatype);
+	}
+	
+	NOT_IMPLEMENTED;
+}
+int MPI_File_read_all_end(MPI_File fh, void *buf, MPI_Status *status)
+{
+	hdfsFile_wrapper *fh_w;
+	
+	if (!fh)
+		return MPI_ERR_ARG;
+
+	fh_w = (hdfsFile_wrapper*)fh;
+
+	if (fh_w->magic != HDFSFILEMAGIC)
+	{
+		int (*real_MPI_File_read_all_end)(MPI_File, void *, MPI_Status *) = NULL;
+		real_MPI_File_read_all_end = dlsym(RTLD_NEXT, "MPI_File_read_all_end");
+		if (!real_MPI_File_read_all_end) {
+			fprintf(stderr, "Failed to load actual MPI_File_read_all_end location.\n");
+			return MPI_ERR_OTHER;
+		}
+
+		status("Passing File_read_all_end to actual MPI function.\n");
+		return real_MPI_File_read_all_end(fh, buf, status);
+	}
+	
+	NOT_IMPLEMENTED;
+}
+int MPI_File_write_all_begin(MPI_File fh, MPIHDFS_CONST void *buf, int count, MPI_Datatype datatype)
+{
+	hdfsFile_wrapper *fh_w;
+	
+	if (!fh)
+		return MPI_ERR_ARG;
+
+	fh_w = (hdfsFile_wrapper*)fh;
+
+	if (fh_w->magic != HDFSFILEMAGIC)
+	{
+		int (*real_MPI_File_write_all_begin)(MPI_File, MPIHDFS_CONST void *, int, MPI_Datatype) = NULL;
+		real_MPI_File_write_all_begin = dlsym(RTLD_NEXT, "MPI_File_write_all_begin");
+		if (!real_MPI_File_write_all_begin) {
+			fprintf(stderr, "Failed to load actual MPI_File_write_all_begin location.\n");
+			return MPI_ERR_OTHER;
+		}
+
+		status("Passing File_write_all_begin to actual MPI function.\n");
+		return real_MPI_File_write_all_begin(fh, buf, count, datatype);
+	}
+	
+	NOT_IMPLEMENTED;	
+}
+int MPI_File_write_all_end(MPI_File fh, MPIHDFS_CONST void *buf, MPI_Status *status)
+{
+	hdfsFile_wrapper *fh_w;
+	
+	if (!fh)
+		return MPI_ERR_ARG;
+
+	fh_w = (hdfsFile_wrapper*)fh;
+
+	if (fh_w->magic != HDFSFILEMAGIC)
+	{
+		int (*real_MPI_File_write_all_end)(MPI_File, MPIHDFS_CONST void *, MPI_Status *) = NULL;
+		real_MPI_File_write_all_end = dlsym(RTLD_NEXT, "MPI_File_write_all_end");
+		if (!real_MPI_File_write_all_end) {
+			fprintf(stderr, "Failed to load actual MPI_File_write_all_end location.\n");
+			return MPI_ERR_OTHER;
+		}
+
+		status("Passing File_write_all_end to actual MPI function.\n");
+		return real_MPI_File_write_all_end(fh, buf, status);
+	}
+	
+	NOT_IMPLEMENTED;
+}
+int MPI_File_read_ordered_begin(MPI_File fh, void *buf, int count, MPI_Datatype datatype)
+{
+	hdfsFile_wrapper *fh_w;
+	
+	if (!fh)
+		return MPI_ERR_ARG;
+
+	fh_w = (hdfsFile_wrapper*)fh;
+
+	if (fh_w->magic != HDFSFILEMAGIC)
+	{
+		int (*real_MPI_File_read_ordered_begin)(MPI_File, void *, int, MPI_Datatype) = NULL;
+		real_MPI_File_read_ordered_begin = dlsym(RTLD_NEXT, "MPI_File_read_ordered_begin");
+		if (!real_MPI_File_read_ordered_begin) {
+			fprintf(stderr, "Failed to load actual MPI_File_read_ordered_begin location.\n");
+			return MPI_ERR_OTHER;
+		}
+
+		status("Passing File_read_ordered_begin to actual MPI function.\n");
+		return real_MPI_File_read_ordered_begin(fh, buf, count, datatype);
+	}
+	
+	NOT_IMPLEMENTED;
+}
+int MPI_File_read_ordered_end(MPI_File fh, void *buf, MPI_Status *status)
+{
+	hdfsFile_wrapper *fh_w;
+	
+	if (!fh)
+		return MPI_ERR_ARG;
+
+	fh_w = (hdfsFile_wrapper*)fh;
+
+	if (fh_w->magic != HDFSFILEMAGIC)
+	{
+		int (*real_MPI_File_read_ordered_end)(MPI_File, MPIHDFS_CONST void *, MPI_Status *) = NULL;
+		real_MPI_File_read_ordered_end = dlsym(RTLD_NEXT, "MPI_File_read_ordered_end");
+		if (!real_MPI_File_read_ordered_end) {
+			fprintf(stderr, "Failed to load actual MPI_File_read_ordered_end location.\n");
+			return MPI_ERR_OTHER;
+		}
+
+		status("Passing File_read_ordered_end to actual MPI function.\n");
+		return real_MPI_File_read_ordered_end(fh, buf, status);
+	}
+	
+	NOT_IMPLEMENTED;
+}
+int MPI_File_write_ordered_begin(MPI_File fh, MPIHDFS_CONST void *buf, int count, MPI_Datatype datatype)
+{
+	hdfsFile_wrapper *fh_w;
+	
+	if (!fh)
+		return MPI_ERR_ARG;
+
+	fh_w = (hdfsFile_wrapper*)fh;
+
+	if (fh_w->magic != HDFSFILEMAGIC)
+	{
+		int (*real_MPI_File_write_ordered_begin)(MPI_File, MPIHDFS_CONST void *, int, MPI_Datatype) = NULL;
+		real_MPI_File_write_ordered_begin = dlsym(RTLD_NEXT, "MPI_File_write_ordered_begin");
+		if (!real_MPI_File_write_ordered_begin) {
+			fprintf(stderr, "Failed to load actual MPI_File_write_ordered_begin location.\n");
+			return MPI_ERR_OTHER;
+		}
+
+		status("Passing File_write_ordered_begin to actual MPI function.\n");
+		return real_MPI_File_write_ordered_begin(fh, buf, count, datatype);
+	}
+	
+	NOT_IMPLEMENTED;
+}
+int MPI_File_write_ordered_end(MPI_File fh, MPIHDFS_CONST void *buf, MPI_Status *status)
+{
+	hdfsFile_wrapper *fh_w;
+	
+	if (!fh)
+		return MPI_ERR_ARG;
+
+	fh_w = (hdfsFile_wrapper*)fh;
+
+	if (fh_w->magic != HDFSFILEMAGIC)
+	{
+		int (*real_MPI_File_write_ordered_end)(MPI_File, MPIHDFS_CONST void *, MPI_Status *) = NULL;
+		real_MPI_File_write_ordered_end = dlsym(RTLD_NEXT, "MPI_File_write_ordered_end");
+		if (!real_MPI_File_write_ordered_end) {
+			fprintf(stderr, "Failed to load actual MPI_File_write_ordered_end location.\n");
+			return MPI_ERR_OTHER;
+		}
+
+		status("Passing File_write_ordered_end to actual MPI function.\n");
+		return real_MPI_File_write_ordered_end(fh, buf, status);
+	}
+	
+	NOT_IMPLEMENTED;
+}
+
+int MPI_File_get_type_extent(MPI_File fh, MPI_Datatype datatype, MPI_Aint *aint)
+{
+	hdfsFile_wrapper *fh_w;
+	
+	if (!fh)
+		return MPI_ERR_ARG;
+
+	fh_w = (hdfsFile_wrapper*)fh;
+
+	if (fh_w->magic != HDFSFILEMAGIC)
+	{
+		int (*real_MPI_File_get_type_extent)(MPI_File, MPI_Datatype, MPI_Aint *) = NULL;
+		real_MPI_File_get_type_extent = dlsym(RTLD_NEXT, "MPI_File_get_type_extent");
+		if (!real_MPI_File_get_type_extent) {
+			fprintf(stderr, "Failed to load actual MPI_File_get_type_extent location.\n");
+			return MPI_ERR_OTHER;
+		}
+
+		status("Passing File_get_type_extent to actual MPI function.\n");
+		return real_MPI_File_get_type_extent(fh, datatype, aint);
+	}
+	
+	NOT_IMPLEMENTED;
+}
+
+int MPI_File_set_atomicity(MPI_File fh, int atomicity)
+{
+	hdfsFile_wrapper *fh_w;
+	
+	if (!fh)
+		return MPI_ERR_ARG;
+
+	fh_w = (hdfsFile_wrapper*)fh;
+
+	if (fh_w->magic != HDFSFILEMAGIC)
+	{
+		int (*real_MPI_File_set_atomicity)(MPI_File, int) = NULL;
+		real_MPI_File_set_atomicity = dlsym(RTLD_NEXT, "MPI_File_set_atomicity");
+		if (!real_MPI_File_set_atomicity) {
+			fprintf(stderr, "Failed to load actual MPI_File_set_atomicity location.\n");
+			return MPI_ERR_OTHER;
+		}
+
+		status("Passing File_set_atomicity to actual MPI function.\n");
+		return real_MPI_File_set_atomicity(fh, atomicity);
+	}
+	
+	NOT_IMPLEMENTED;
+}
+int MPI_File_get_atomicity(MPI_File fh, int *atomicity)
+{
+	hdfsFile_wrapper *fh_w;
+	
+	if (!fh)
+		return MPI_ERR_ARG;
+
+	fh_w = (hdfsFile_wrapper*)fh;
+
+	if (fh_w->magic != HDFSFILEMAGIC)
+	{
+		int (*real_MPI_File_get_atomicity)(MPI_File, int *) = NULL;
+		real_MPI_File_get_atomicity = dlsym(RTLD_NEXT, "MPI_File_get_atomicity");
+		if (!real_MPI_File_get_atomicity) {
+			fprintf(stderr, "Failed to load actual MPI_File_get_atomicity location.\n");
+			return MPI_ERR_OTHER;
+		}
+
+		status("Passing File_get_atomicity to actual MPI function.\n");
+		return real_MPI_File_get_atomicity(fh, atomicity);
+	}
+	
+	NOT_IMPLEMENTED;
+}
+int MPI_File_sync(MPI_File fh)
+{
+	hdfsFile_wrapper *fh_w;
+	
+	if (!fh)
+		return MPI_ERR_ARG;
+
+	fh_w = (hdfsFile_wrapper*)fh;
+
+	if (fh_w->magic != HDFSFILEMAGIC)
+	{
+		int (*real_MPI_File_sync)(MPI_File) = NULL;
+		real_MPI_File_sync = dlsym(RTLD_NEXT, "MPI_File_sync");
+		if (!real_MPI_File_sync) {
+			fprintf(stderr, "Failed to load actual MPI_File_sync location.\n");
+			return MPI_ERR_OTHER;
+		}
+
+		status("Passing File_sync to actual MPI function.\n");
+		return real_MPI_File_sync(fh);
+	}
+	
+	NOT_IMPLEMENTED;
+}
