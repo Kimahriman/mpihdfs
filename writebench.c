@@ -12,7 +12,7 @@ MPI_Offset write_file(char * name, long file_size, long block_size) {
 	long written = 0;
 	MPI_File out;
 
-	MPI_File_open(MPI_COMM_WORLD, name, MPI_MODE_WRONLY, MPI_INFO_NULL, &out);
+	MPI_File_open(MPI_COMM_WORLD, name, MPI_MODE_WRONLY | MPI_MODE_CREATE, MPI_INFO_NULL, &out);
 
 	chunk = malloc(block_size * sizeof(char));
 	for (i=0; i < block_size; i++) {
