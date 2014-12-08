@@ -37,26 +37,6 @@ Adam Binford (adamq)
 \input{experiment}
 \input{concl}
 
-\begin{table}[t]
-	\centering
-	\small
-	\begin{tabular}{ccc}
-		\toprule
-	{\bf Function} &{\bf Mode} &{\bf Error} \\\otoprule
-		{\tt MPI\_File\_write\_at} & {\tt CREATE|RDWR} & cannot open an
-		hdfs file in O\_RDWR mode \\
-		{\tt MPI\_File\_write\_at} & {\tt CREATE|WRONLY} & cannot open an
-		hdfs file in O\_RDWR mode \\
-		{\tt MPI\_File\_write\_at} & {\tt WRONLY} & cannot open an
-		hdfs file in O\_RDWR mode \\
-		{\tt MPI\_File\_write\_shared} & {\tt WRONLY} & cannot open an
-		hdfs file in O\_RDWR mode \\
-		{\tt MPI\_File\_write\_shared} & {\tt APPEND} &file open. code:
-		201388309\\\bottomrule 
-	\end{tabular}
-	\caption{\small Error codes for parallel writes on fuse-dfs.}
-	\label{tab:write}
-\end{table}
 \bibliography{ref}{}
 \bibliographystyle{acm}
 \end{document}
