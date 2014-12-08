@@ -17,7 +17,7 @@ set grid y
 plot  \
  "read1.dat" using 2 with linespoints lw 1.5 pt 7 ps 1.5 ti "Local",\
  "" using 3 with linespoints lw 1.5 pt 6 ps 1.5 ti "NFS",\
- "" using 4 with linespoints lw 1.5 pt 5 ps 1.5 ti "ADAM",\
+ "" using 4 with linespoints lw 1.5 pt 5 ps 1.5 ti "MPIHDFS",\
  "" using 5:xtic(1) with linespoints lw 1.5 pt 4 ps 1.5 ti "FuseDFS" 
 
 
@@ -40,7 +40,7 @@ set grid y
 
 plot  \
  "read2.dat" using 2 with linespoints lw 1.5 pt 6 ps 1.5 ti "NFS",\
- "" using 3 with linespoints lw 1.5 pt 5 ps 1.5 ti "ADAM",\
+ "" using 3 with linespoints lw 1.5 pt 5 ps 1.5 ti "MPIHDFS",\
  "" using 4:xtic(1) with linespoints lw 1.5 pt 4 ps 1.5 ti "FuseDFS" 
 
 #----------------------------------------------------------------------
@@ -62,7 +62,7 @@ set grid y
 
 plot  \
  "read3.dat" using 2 with linespoints lw 1.5 pt 6 ps 1.5 ti "NFS",\
- "" using 3 with linespoints lw 1.5 pt 5 ps 1.5 ti "ADAM",\
+ "" using 3 with linespoints lw 1.5 pt 5 ps 1.5 ti "MPIHDFS",\
  "" using 4:xtic(1) with linespoints lw 1.5 pt 4 ps 1.5 ti "FuseDFS" 
 #----------------------------------------------------------------------
 reset
@@ -83,10 +83,10 @@ set xtics nomirror
 set grid y
 
 plot  \
- "read4.dat" using 2 with linespoints lw 1.5 pt 5 ps 1.5 ti "ADAM-3",\
+ "read4.dat" using 2 with linespoints lw 1.5 pt 5 ps 1.5 ti "MPIHDFS-3",\
  "" using 3:xtic(1) with linespoints lw 1.5 pt 4 ps 1.5 ti "FuseDFS-3" ,\
  "" using 4 with linespoints lw 1.5 pt 3 ps 1.5 ti "FuseDFS-1",\
- "" using 5 with linespoints lw 1.5 pt 2 ps 1.5 ti "ADAM-1"
+ "" using 5 with linespoints lw 1.5 pt 2 ps 1.5 ti "MPIHDFS-1"
 
 reset
 set terminal postscript eps enhanced "Helvetica" 26 
@@ -119,5 +119,5 @@ set xtics nomirror
 set grid y
 
 plot  \
- "over.dat" using 2 with linespoints lw 1.5 pt 5 ps 1.5 ti "ADAM",\
+ "over.dat" using 2 with linespoints lw 1.5 pt 5 ps 1.5 ti "MPIHDFS",\
  "" using 3:xtic(1) with line ti "MPI-IO" 
