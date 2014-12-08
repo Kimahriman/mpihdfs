@@ -289,14 +289,106 @@ int MPI_File_get_amode(MPI_File fh, int *amode)
 	return MPI_SUCCESS;
 }
 
-int MPI_File_set_info(MPI_File fh, MPI_Info info) { NOT_IMPLEMENTED; }
-int MPI_File_get_info(MPI_File fh, MPI_Info *info) { NOT_IMPLEMENTED; }
+int MPI_File_set_info(MPI_File fh, MPI_Info info)
+{
+	hdfsFile_wrapper *fh_w;
+	
+	if (!fh)
+		return MPI_ERR_ARG;
+
+	fh_w = (hdfsFile_wrapper*)fh;
+
+	if (fh_w->magic != HDFSFILEMAGIC)
+	{
+		int (*real_MPI_File_set_info)(MPI_File, MPI_Info) = NULL;
+		real_MPI_File_set_info = dlsym(RTLD_NEXT, "MPI_File_set_info");
+		if (!real_MPI_File_set_info) {
+			fprintf(stderr, "Failed to load actual MPI_File_set_info location.\n");
+			return MPI_ERR_OTHER;
+		}
+
+		status("Passing File_set_info to actual MPI function.\n");
+		return real_MPI_File_set_info(fh, info);
+	}
+	
+	NOT_IMPLEMENTED;
+}
+int MPI_File_get_info(MPI_File fh, MPI_Info *info)
+{
+	hdfsFile_wrapper *fh_w;
+	
+	if (!fh)
+		return MPI_ERR_ARG;
+
+	fh_w = (hdfsFile_wrapper*)fh;
+
+	if (fh_w->magic != HDFSFILEMAGIC)
+	{
+		int (*real_MPI_File_get_info)(MPI_File, MPI_Info *) = NULL;
+		real_MPI_File_get_info = dlsym(RTLD_NEXT, "MPI_File_get_info");
+		if (!real_MPI_File_get_info) {
+			fprintf(stderr, "Failed to load actual MPI_File_get_info location.\n");
+			return MPI_ERR_OTHER;
+		}
+
+		status("Passing File_get_info to actual MPI function.\n");
+		return real_MPI_File_get_info(fh, info);
+	}
+	
+	NOT_IMPLEMENTED;
+}
 
 /* Section 9.3 */
 int MPI_File_set_view(MPI_File fh, MPI_Offset disp, MPI_Datatype etype,
-	         MPI_Datatype filetype, MPIHDFS_CONST char *datarep, MPI_Info info) { NOT_IMPLEMENTED; }
+	         MPI_Datatype filetype, MPIHDFS_CONST char *datarep, MPI_Info info)
+{
+	hdfsFile_wrapper *fh_w;
+	
+	if (!fh)
+		return MPI_ERR_ARG;
+
+	fh_w = (hdfsFile_wrapper*)fh;
+
+	if (fh_w->magic != HDFSFILEMAGIC)
+	{
+		int (*real_MPI_File_set_view)(MPI_File, MPI_Offset, MPI_Datatype, MPI_Datatype, MPIHDFS_CONST char *, MPI_Info) = NULL;
+		real_MPI_File_set_view = dlsym(RTLD_NEXT, "MPI_File_set_view");
+		if (!real_MPI_File_set_view) {
+			fprintf(stderr, "Failed to load actual MPI_File_set_view location.\n");
+			return MPI_ERR_OTHER;
+		}
+
+		status("Passing File_set_view to actual MPI function.\n");
+		return real_MPI_File_set_view(fh, disp, etype, filetype, datarep, info);
+	}
+	
+	NOT_IMPLEMENTED;
+}
 int MPI_File_get_view(MPI_File fh, MPI_Offset *disp, 
-                 MPI_Datatype *etype, MPI_Datatype *filetype, char *datarep) { NOT_IMPLEMENTED; }
+                 MPI_Datatype *etype, MPI_Datatype *filetype, char *datarep)
+{
+	hdfsFile_wrapper *fh_w;
+	
+	if (!fh)
+		return MPI_ERR_ARG;
+
+	fh_w = (hdfsFile_wrapper*)fh;
+
+	if (fh_w->magic != HDFSFILEMAGIC)
+	{
+		int (*real_MPI_File_get_view)(MPI_File, MPI_Offset *, MPI_Datatype *, MPI_Datatype *, char *) = NULL;
+		real_MPI_File_get_view = dlsym(RTLD_NEXT, "MPI_File_get_view");
+		if (!real_MPI_File_get_view) {
+			fprintf(stderr, "Failed to load actual MPI_File_get_view location.\n");
+			return MPI_ERR_OTHER;
+		}
+
+		status("Passing File_get_view to actual MPI function.\n");
+		return real_MPI_File_get_view(fh, disp, etype, filetype, datarep);
+	}
+	
+	NOT_IMPLEMENTED;
+}
 
 /*
  * Moves to a certain position in the file. Since views are not currently
@@ -390,4 +482,27 @@ int MPI_File_get_position(MPI_File fh, MPI_Offset *offset)
 
 	return MPI_SUCCESS;
 }
-int MPI_File_get_byte_offset(MPI_File fh, MPI_Offset offset, MPI_Offset *disp) { NOT_IMPLEMENTED; }
+int MPI_File_get_byte_offset(MPI_File fh, MPI_Offset offset, MPI_Offset *disp)
+{
+	hdfsFile_wrapper *fh_w;
+	
+	if (!fh)
+		return MPI_ERR_ARG;
+
+	fh_w = (hdfsFile_wrapper*)fh;
+
+	if (fh_w->magic != HDFSFILEMAGIC)
+	{
+		int (*real_MPI_File_get_byte_offset)(MPI_File, MPI_Offset, MPI_Offset *) = NULL;
+		real_MPI_File_get_byte_offset = dlsym(RTLD_NEXT, "MPI_File_get_byte_offset");
+		if (!real_MPI_File_get_byte_offset) {
+			fprintf(stderr, "Failed to load actual MPI_File_get_byte_offset location.\n");
+			return MPI_ERR_OTHER;
+		}
+
+		status("Passing File_get_byte_offset to actual MPI function.\n");
+		return real_MPI_File_get_byte_offset(fh, offset, disp);
+	}
+	
+	NOT_IMPLEMENTED;
+}
