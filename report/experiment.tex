@@ -124,7 +124,15 @@ network. Sometimes the opposite case is observed.
 As described earlier, Hadoop library has a limitation where it doesn't support
 random writes, thus we encounter errors on both FuseDFS and {\proj}.
 Table~\ref{tab:write} shows an example of error messages that we encountered
-when trying to perform parallel writes on FuseDFS. According to the
+when trying to perform parallel writes on FuseDFS. We tested using {\tt
+MPI\_File\_write\_at} where each process holds a separate file pointer, and {\tt
+MPI\_File\_write\_shared} where all processes use a shared file pointer. We
+didn't test other functions such as {\tt MPI\_File\_write\_all} because the
+differences of these functions are whether they are collective functions or
+blocking functions, which we believe doesn't have much impact on data access
+pattern.
+``Mode'' means the MPI file access mode when open the file. We tested all the
+combinations and we encounter errors either from HDFS side or MPI side. According to the
 wiki~\cite{fuse}, the way to support random writes is to use methods like RPC
 and protobuf instead of HDFS library. However, there is no way to verify that
 because there is no existing projects that work yet. By the time we realized this
