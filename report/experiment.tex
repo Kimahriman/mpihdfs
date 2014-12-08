@@ -153,19 +153,22 @@ happens? I don't really know how the library triggers write, maybe you can think
 of some reasons for this?} 
 
 \subsection{Performance Overhead}
-In this section we evaluate the performance overhead of {\proj} against standard
-MPI-IO library when accessing normal files. Since {\proj} is designed as a hook
-that determines whether we need to trigger MPI standard functions or our own.
-{\color{red} find a better way to say this..} If {\proj} determines that the
-operation is not an HDFS file operation, it directly hands over the control to
-MPI standard functions. Therefore, we expect negligible
+In this section we evaluate the performance overhead of {\proj} against the standard
+MPI-IO library when accessing regularly mounted file systems. Since {\proj} is designed
+to allow simultaneous access to both HDFS and non-HDFS file systems, the overhead to non-HDFS
+file systems should be as small as possible. This way the benefits of simple and quick reads
+of HDFS files do not get overshadowed by the heavy overhead induced by {\proj}.
+If {\proj} determines that the operation is not an HDFS file operation, it directly hands over the control to
+MPI standard functions by dynamically loading them from the actual MPI library. Therefore, we expect negligible
 overhead from {\proj} when performing normal file operations. To verify this, we
-conduct experiments that measure both read and write bandwidths on local files. We use MPI-IO
+conduct  an experiment that measure both read and write bandwidths on local files. We use MPI-IO
 standard operation bandwidths as our baseline. 
 
 Figure~\ref{fig:over} shows the results. We can see that there is almost no
-performance overhead caused by {\proj}. Same results are also observed in write
-operations. Specifically, {\proj} out perform native MPI-IO with 0.5\%.
+performance overhead caused by {\proj}. The same results are also observed in write
+operations. In fact, at one point the {\proj} outperforms invoking MPI-IO directly,
+indicating that much of the overhead seen is likely slight deviations in bandwidth
+that naturally occur at different times.
 
 \begin{figure}[t]
 \begin{center}
