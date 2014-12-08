@@ -92,6 +92,15 @@ network transfers. However, when the number of processes increases, the
 underlying number of nodes is not big enough to serve the locality needs. That
 causes the data to transfer through the network.
 
+\begin{figure}[t]
+\begin{center}
+\epsfig{figure=write.eps}
+\caption{\small Write bandwidth of Local, NFS, {\proj} and FuseDFS
+with 1 replica and 3 replicas respectively.}
+\label{fig:write}
+\vspace{-6pt}
+\end{center}
+\end{figure}
 
 To verify what we expected, we conduct another experiment where we add a data
 node in the HDFS cluster and set the
@@ -110,16 +119,6 @@ with 3 replicas performs the best and FuseDFS with 1 replica performs worst,
 which are expected. {\proj} with 1 replica and FuseDFS with 3 replicas are not
 deterministic. Sometimes the overhead of FUSE is bigger than the overhead of the
 network. Sometimes the opposite case is observed. 
-
-\begin{figure}[t]
-\begin{center}
-\epsfig{figure=write.eps}
-\caption{\small Write bandwidth of Local, NFS, {\proj} and FuseDFS
-with 1 replica and 3 replicas respectively.}
-\label{fig:write}
-\vspace{-6pt}
-\end{center}
-\end{figure}
 
 \subsection{Write Performance}
 As described earlier, Hadoop library has a limitation where it doesn't support
