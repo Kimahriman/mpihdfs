@@ -71,7 +71,7 @@ Figure~\ref{fig:read1} shows the read bandwidths for local file access, NFS, {\p
 and FuseDFS. Here we configure HDFS to have one replica for each file block with
 the default block size (64MB). To match with the default block size of HDFS, we
 also configure the benchmark with 64MB access block size so that each process
-access 64MB of data each time. Note that we only use two of the nodes to set up
+accesses 64MB of data each time. Note that we only use two of the nodes to set up
 HDFS in this case. As we expected, the local file access achieves
 the best throughput compared with the other three methods. However, these other three
 methods show mostly the same performance. The
@@ -85,7 +85,7 @@ because {\proj} does not entail the overhead of FUSE. The more interesting thing
 here is the comparison between NFS and {\proj}. When there are small
 number of processes, {\proj} performs even better than NFS. However, after the
 number of processes reaches 6, NFS starts to perform better than {\proj}. We
-suspect the reason behind is because we have only one replica in each node, and
+suspect the reason behind this is because we have only one replica in each node, and
 the processors are located within the data node. With the same access block
 size, some how some processes achieved data locality, thus avoiding some of the
 network transfers. However, when the number of processes increases, the
@@ -121,7 +121,7 @@ deterministic. Sometimes the overhead of FUSE is bigger than the overhead of the
 network. Sometimes the opposite case is observed. 
 
 \subsection{Write Performance}
-As described earlier, Hadoop library has a limitation where it doesn't support
+As described earlier, the HDFS library has a limitation where it doesn't support
 random writes, thus we encounter errors on both FuseDFS and {\proj}.
 Table~\ref{tab:write} shows an example of error messages that we encountered
 when trying to perform parallel writes on FuseDFS. We tested using {\tt
@@ -131,17 +131,17 @@ didn't test other functions such as {\tt MPI\_File\_write\_all} because the
 differences of these functions are whether they are collective functions or
 blocking functions, which we believe doesn't have much impact on data access
 pattern.
-``Mode'' means the MPI file access mode when open the file. We tested all the
-combinations and we encounter errors either from HDFS side or MPI side. According to the
+``Mode'' means the MPI file access mode specified when opening the file. We tested all the
+combinations and we encountered errors either from the HDFS side or MPI side. According to the
 wiki~\cite{fuse}, the way to support random writes is to use methods like RPC
 and protobuf instead of HDFS library. However, there is no way to verify that
-because there is no existing projects that work yet. By the time we realized this
+because there is no existing projects that works yet. By the time we realized this
 problem is caused by the HDFS library, it was too late for us to change the
 design of {\proj} and use protobuf instead. Hence, here we only evaluate
 performance of sequential writes within one process. We run the same benchmark
 that writes 1GB file with the block size of 64MB to measure the write bandwidth.
 Similarly, we measure the performance on HDFS configured with 1 replica and 3
-replicas respectively.
+replicas, respectively.
 \begin{table}[t]
 	\centering \small \begin{tabular}{ccc} \toprule {\bf Function} &{\bf
 Mode} &{\bf Error} \\\otoprule {\tt MPI\_File\_write\_at} & {\tt CREATE|RDWR} &
@@ -154,7 +154,7 @@ MPI\_File\_write\_at} & {\tt WRONLY} & cannot open an hdfs file in O\_RDWR mode
 codes for parallel writes on FuseDFS.} \label{tab:write}
 \end{table}
 
-Figure~\ref{fig:write} shows the results. The results are quite surprising.
+Figure~\ref{fig:write} shows the results, which are quite surprising.
 FuseDFS performs better than {\proj} and NFS both in HDFS with 1 replica and 3
 replicas. We are not sure why this occurs. One possibility is that FuseDFS
 uses some sort of delayed writes to improve latency and appear to have
@@ -169,7 +169,7 @@ of HDFS files do not get overshadowed by the heavy overhead induced by {\proj}.
 If {\proj} determines that the operation is not an HDFS file operation, it directly hands over the control to
 MPI standard functions by dynamically loading them from the actual MPI library. Therefore, we expect negligible
 overhead from {\proj} when performing normal file operations. To verify this, we
-conduct  an experiment that measure both read and write bandwidths on local files. We use MPI-IO
+conduct an experiment that measures both read and write bandwidths on local files. We use MPI-IO
 standard operation bandwidths as our baseline. 
 
 Figure~\ref{fig:over} shows the results. We can see that there is almost no

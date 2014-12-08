@@ -119,7 +119,7 @@ if users are unable to work with the limited writing facilities, they can write
 normally to another file system, possibly copying the data back to HDFS later if
 necessary.
 
-\subsection{Hooking Library}
+\subsection{MPIHDFS}
 Our goal was to provide an extremely simple approach to allow HDFS access
 from MPI programs. We do not require MPI applications to be compiled in a
 certain way or with one of our provided libraries. Instead, we dynamically catch
@@ -141,7 +141,7 @@ The script allows our library to receive the MPI file calls by prioritizing our
 library over the actual MPI library during program startup. This is achieved
 using the \texttt{LD\_PRELOAD} environment variable. More information about
 dynamic linking and library preloading can be found in \cite{ld.so}. In our
-library, we have defined our own version of every single MPI\_File function,
+library, we have defined our own version of every single MPI-IO function,
 even those we have not implemented. Defining every function lets us ensure there
 is no mix up going between our version of MPI functions and the actual MPI
 functions. This ensures a cleaner failure if an unsupported function is invoked,
@@ -187,7 +187,7 @@ interacting with HDFS. In the default mode of operation, the
 \texttt{MPI\_File\_open} wrapper function parses the URL given to it. If it is
 of the form \texttt{hdfs://<HDFS NameNode host>:<port><file path>}, then the
 \texttt{hdfsFile\_wrapper} object is created and pointed to by the returned
-\texttt{MPI\_File} object, and all subsequent operations of this object in other
+\texttt{MPI\_File} object, and all subsequent operations on this object in other
 MPI file functions will run our special HDFS code. If the URL does not match
 this format, then the \texttt{MPI\_File\_open} call passes control to the actual
 MPI function, and all subsequent operations on the returned \texttt{MPI\_File}

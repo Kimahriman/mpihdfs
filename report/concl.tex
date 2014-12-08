@@ -1,7 +1,7 @@
 \section{Conclusion and Future Work}
 In this project, we study the methods to support MPI-IO on top of HDFS. We
-surveyed existing methods that use technologies such as FUSE, HDFS library, NFS
-proxy, RPC, and so on. We investigate whether these methods we found are
+survey existing methods that use technologies such as FUSE, HDFS library, NFS
+proxy, RPC, and so on. We investigate whether these methods are
 suitable for supporting MPI-IO. Furthermore, we design and implement {\proj}, an
 extension to MPI-IO that seamlessly supports HDFS file read/write operations for
 MPI applications. {\proj} uses the HDFS library to interact with HDFS and provides
@@ -18,8 +18,8 @@ fundamental limitation that prevents MPI parallel write operations. In future
 work, we plan to explore other technologies such as RPC and protobuf to solve
 this problem. In this study, we didn't explore file update operations on HDFS.
 However, we are aware that as an append-only file system, it is not straight
-forward to perform file updates on HDFS efficiently. HDFS library gives little
+forward to perform file updates on HDFS efficiently. Finally, the HDFS library gives little
 information about where data blocks are located. To achieve better data-locality and
 IO throughput, we need to get more information from HDFS and leverage
-information such as location to provide better strategy for deciding where MPI
+information such as location to provide a better strategy for deciding where MPI
 processes should be running, as well as which data blocks each process should handle.

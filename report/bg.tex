@@ -1,7 +1,7 @@
 \section{Existing Methods}
 \label{sec:bg}
-The Hadoop community makes a lot of effort~\cite{fuse} to ease the use of HDFS to
-facilitate regular file maintenance. For example, there are many tools to support
+The Hadoop community makes a lot of effort to ease the use of HDFS to
+facilitate regular file maintenance~\cite{fuse}. For example, there are many tools to support
 operations using standard Unix
 utilities such as `ls', `cd', `cp', `mkdir', `find', `grep', or use standard
 POSIX libraries like open, write, read, close from C, C++, etc. Such efforts
@@ -24,7 +24,7 @@ Unlike
 these projects, projects such as native-hdfs-fuse~\cite{native} do not use the
 HDFS library or otherwise start a JVM - it constructs and sends the protocol buffer
 messages itself. This project also uses FUSE to interact with users. Another
-project Hadoofus~\cite{hadoofus} provides only a C
+project, Hadoofus~\cite{hadoofus}, provides only a C
 API for directly calling Namenode RPCs and performing Datanode block read and
 write operations, as well as a Hadoop Library compatible interface. Such methods
 avoid using the HDFS library by directly interacting with a Namenode using some
@@ -38,10 +38,10 @@ for HDFS for clients to use. However, the latest version of MPICH that
 we use only supports NFS3. Thus the solution is not suitable for MPI-IO. On the
 other hand, NFS Gateway is a Hadoop official effort that supports NFS3. However,
 it is claimed that file append is supported but random write is not supported.
-NFS Gateway requires to stop system
-critical service such as nfs and rpcbind. Since our test bed is in a public
+NFS Gateway requires stopping system
+critical services such as nfs and rpcbind. Since our test bed is in a public
 cluster, we could not evaluate this method here. However, we believe this method would
-not perform better than NFS, and it doesn't support random write either.
+not perform better than NFS, and it doesn't support random writes either.
 
 The challenges we have faced through are experience can be summed up as follows.
 \begin{itemize}
