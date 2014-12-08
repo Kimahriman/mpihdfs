@@ -4,22 +4,22 @@ surveyed existing methods that use technologies such as FUSE, HDFS library, NFS
 proxy, RPC, and so on. We investigate whether these methods we found are
 suitable for supporting MPI-IO. Furthermore, we design and implement {\proj}, an
 extension to MPI-IO that seamlessly supports HDFS file read/write operations for
-MPI applications. {\proj} uses HDFS library to interact with HDFS and provides
-a transparent support that requires no change on user side. To evaluate the
-performance of {\proj} and other available methods, we develop a MPI-IO
+MPI applications. {\proj} uses the HDFS library to interact with HDFS and provides
+a transparent support that requires no changes on the user side. To evaluate the
+performance of {\proj} and other available methods, we develop an MPI-IO
 specialized benchmark that measures the read and write bandwidth. Based on that,
 we perform a thorough performance study of {\proj}, FuseDFS, NFS, and local file
 operations.
 
-However, there are some challenges during our study that we cannot solve yet. We
+However, there are some challenges that we faced during our study that we have not
+been able to solve yet. We
 found that the lack of support of random writes of HDFS library is the
 fundamental limitation that prevents MPI parallel write operations. In future
 work, we plan to explore other technologies such as RPC and protobuf to solve
 this problem. In this study, we didn't explore file update operations on HDFS.
 However, we are aware that as an append-only file system, it is not straight
 forward to perform file updates on HDFS efficiently. HDFS library gives little
-information about where data blocks locate. To achieve better data-locality and
+information about where data blocks are located. To achieve better data-locality and
 IO throughput, we need to get more information from HDFS and leverage
 information such as location to provide better strategy for deciding where MPI
-processes should be running, as well as which data block should one process
-handle.
+processes should be running, as well as which data blocks each process should handle.

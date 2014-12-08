@@ -39,6 +39,31 @@ we use only supports NFS3. Thus the solution is not suitable for MPI-IO. On the
 other hand, NFS Gateway is a Hadoop official effort that supports NFS3. However,
 it is claimed that file append is supported but random write is not supported.
 NFS Gateway requires to stop system
-critical service such as nfs and rpcbind. Since our testbed is in a public
+critical service such as nfs and rpcbind. Since our test bed is in a public
 cluster, we could not evaluate this method here. However, we believe this method would
-not perform better than NFS, plus, it doesn't support random write either.
+not perform better than NFS, and it doesn't support random write either.
+
+The challenges we have faced through are experience can be summed up as follows.
+\begin{itemize}
+\item Existing methods such as FuseDFS and HDFS-NFS-Proxy are designed to provide ease of
+	maintenance instead of parallel file accessing, thus only sequential
+	write operations are supported. Often failure is the case when we try to
+	perform parallel writes (Section~\ref{sec:exp}). 
+\item MPI-IO accesses underlying file systems using standard POSIX IO system
+	calls, while HDFS is not designed to be a mountable POSIX file system
+	and must be accessed through its own API. The native library provided by
+	HDFS gives a C/C++ compatible library that can be adopted for MPI
+	applications.
+\item During our development, we found that HDFS does not support 
+	parallel or positional writes. The HDFS native library provides many
+	checks to ensure this cannot happen. While emulating this behavior
+	using backend logic should be possible, we consider this a whole topic of
+	research on its own.
+\item HDFS is an append-only file system, while sometimes MPI jobs want to
+	modify the data in the file. To achieve that, one must rewrite the
+	entire file and replace the old file. This can cause a huge overhead on
+	small file updates. However, this problem is not addressed in this
+	report because our study and benchmark focus on sequential write and
+	parallel read throughput without consideration of file updates.
+\end{itemize}
+

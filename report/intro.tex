@@ -47,63 +47,29 @@ performance of MPI-IO on HDFS using PLFS. However, HDFS is supported as a
 component of PLFS and no data locality is achieved for MPI jobs. As far as we
 know, there is no such work on supporting MPI on top of HDFS directly. This
 project focuses on exploring the feasibility and performance of enabling MPI-IO
-on top of HDFS using existing technologies. This study is based on the
-observation that MPI-IO provides great flexibility that it is possible for users
-to decide the process-to-block mapping, which gives a big potential that an
-optimized allocation can be decided {\color{red} I don't understand what this is saying}. In this work, we explore and evaluate
+on top of HDFS using existing technologies. In this work, we explore and evaluate
 the existing methods including FuseDFS~\cite{fuse}, Native Library~\cite{lib},
 HDFS-NFS-Proxy~\cite{proxy} mainly on whether they support MPI-IO and how
-they perform. Furthermore, We design and develop
+well they perform. Furthermore, we design and develop
 {\proj}, an extension to current MPI-IO that supports direct access to HDFS for
 MPI applications. {\proj} uses the native library provided by HDFS and provides a
 seamless user experience. In order to evaluate the performance, we also
 developed a MPI-IO benchmark that reports read and write bandwidth. This report
 reflects the difficulties we encountered, whether each method can be adopted by
-MPI-IO, and how they perform. 
+MPI-IO, and how well they perform. 
 
 More specifically, our contribution in this study is as follows:
 \begin{itemize}
 \item We perform an MPI-IO support study of existing methods we are aware of. This
 	is the first study of directly support MPI-IO on top of HDFS as far as
 	we know (Section~\ref{sec:bg}).
-\item We design and implement {\proj}, an extension to MPI-IO that seamlessly
-	supports HDFS file read/write operations for MPI applications 
-	(Section~\ref{sec:impl}). The code is available at \url{github.com/Kimahriman/mpihdfs}
 \item We identify the fundamental limitation of HDFS that prevents parallel
 	write operations. We discover this limitation in several methods that we
 	explore (Section~\ref{sec:impl}).
+\item We design and implement {\proj}, an extension to MPI-IO that seamlessly
+	supports HDFS file read/write operations for MPI applications 
+	(Section~\ref{sec:impl}). The code is available at \url{github.com/Kimahriman/mpihdfs}
 \item We develop an MPI-IO benchmark that measures read/write bandwidth, and
 	we perform a thorough performance study on {\proj} and the existing
 	methods (Section~\ref{sec:exp}).
 \end{itemize}
-
-During our study and development, we encountered several
-challenges including ones that remain to be solved.
-\begin{itemize}
-\item Existing methods such as FuseDFS and HDFS-NFS-Proxy are designed to provide ease of
-	maintenance instead of parallel file accessing, thus only sequential
-	write operations are supported. Often failure is the case when we try to
-	perform parallel writes (Section~\ref{sec:exp}). 
-\item MPI-IO accesses underlying file systems using standard POSIX IO system
-	calls, while HDFS is not designed to be a mountable POSIX file system
-	and must be accessed through its own API. The native library provided by
-	HDFS gives a C/C++ compatible library that can be adopted for MPI
-	applications.
-	However, MPI-IO does not have the corresponding support to access
-	through the library. We develop a hook which enables MPI-IO to access
-	HDFS files using the native library transparently so that the only thing
-	the user needs to provide is the HFDS URL to locate the file
-	(Section~\ref{sec:impl}).
-\item During our development, we found that HDFS does not support 
-	parallel or positional writes. The HDFS native library provides many
-	checks to ensure this cannot happen. While emulating this behavior
-	using backend logic should be possible, we consider this a whole topic of
-	research on its own.
-\item HDFS is an append-only file system, while sometimes MPI jobs want to
-	modify the data in the file. To achieve that, one must rewrite the
-	entire file and replace the old file. This can cause a huge overhead on
-	small file updates. However, this problem is not addressed in this
-	report because our study and benchmark focus on parallel reads and
-	writes throughput without consideration of file updates.
-\end{itemize}
-

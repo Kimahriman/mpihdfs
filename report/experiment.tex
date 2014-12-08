@@ -148,9 +148,9 @@ codes for parallel writes on FuseDFS.} \label{tab:write}
 
 Figure~\ref{fig:write} shows the results. The results are quite surprising.
 FuseDFS performs better than {\proj} and NFS both in HDFS with 1 replica and 3
-replicas. {\color{red} What to say here? just say we have no idea why this
-happens? I don't really know how the library triggers write, maybe you can think
-of some reasons for this?} 
+replicas. We are not sure why this occurs. One possibility is that FuseDFS
+uses some sort of delayed writes to improve latency and appear to have
+higher throughput.
 
 \subsection{Performance Overhead}
 In this section we evaluate the performance overhead of {\proj} against the standard
