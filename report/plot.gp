@@ -88,22 +88,36 @@ plot  \
  "" using 4 with linespoints lw 1.5 pt 3 ps 1.5 ti "FuseDFS-1",\
  "" using 5 with linespoints lw 1.5 pt 2 ps 1.5 ti "ADAM-1"
 
-#reset
-#set terminal postscript eps enhanced "Helvetica" 26 
-#set nolog xy
-#set key nobox out horiz center top
-#set ytics 1000
-#set boxwidth 0.3
-#set size 1, 0.75
-#set style fill solid border 1
-#set ylabel "Average job execution time (s)"
-#set output "mpi_vs_yarn_big.eps"
-#set xr[0.5 : 6.5]
-#set xtics("milc" 1, "GemsFDTD" 2, "pop2" 3, "lammps" 4, "socorro" 5, "lu" 6)
-#set xtics nomirror rotate by -25 offset -1.5,0
-#set yr [:5500]
-#set grid y
-#
-#plot "mpi_vs_yarn_big.dat" using ($1-0.15):2 w boxes fs  pattern 1  title 'MPI', \
-#""  using ($1+0.15):3 w boxes fs  solid 0.4  title 'Gerbil' 
+reset
+set terminal postscript eps enhanced "Helvetica" 26 
+set nolog xy
+set nokey 
+set style data histogram
+set boxwidth 1.5
+set size 1, 0.75
+set ylabel "Write Bandwidth (MB/s)"
+set output "write.eps"
+set xtics nomirror rotate by -25 offset -1.5,0
+set grid y
+
+plot "write.dat" using 2:xticlabels(1) fs solid
 #----------------------------------------------------------------------
+reset
+set terminal postscript eps enhanced "Helvetica" 26
+set nolog xy
+set ylabel "Read Overhead"
+set xlabel "Number of processes"
+set output "over1.eps"
+set key nobox out horiz center top
+#set ytics 1000
+set size 1,0.75
+set yr[0.4:1.6]
+
+set style fill solid border 1
+#set xr [0.5 : 4.5]
+set xtics nomirror 
+set grid y
+
+plot  \
+ "over.dat" using 2 with linespoints lw 1.5 pt 5 ps 1.5 ti "ADAM",\
+ "" using 3:xtic(1) with line ti "MPI-IO" 

@@ -74,7 +74,7 @@ difference between the local file access and the other methods are network
 connection. Both HDFS and NFS methods fetch data through the network connection.
 
 To better compare the performance difference between HDFS methods and NFS. We
-take away the "Local" in the figure as shown in Figure~\ref{fig:read2}. We 
+take away the ``Local'' in the figure as shown in Figure~\ref{fig:read2}. We 
 can see that {\proj} performs better than FuseDFS method, which is expected
 because {\proj} does not entail the overhead of Fuse. The more interesting thing
 here is the comparison between NFS and {\proj}. When there are small
@@ -86,6 +86,7 @@ size, some how some processes achieved data locality. Thus avoids some of the
 network transferring. However, when the number of processes increases, the
 underlying number of nodes is not big enough to serve the locality needs. That
 causes the data transferring through the network.
+
 
 To verify what we expected, we conduct another experiment where we add a data
 node in the HDFS cluster and set the
@@ -105,4 +106,68 @@ which are expected. {\proj} with 1 replica and FuseDFS with 3 replicas are not
 deterministic. Sometimes the overhead of Fuse is bigger than the overhead of
 network. Sometimes the opposite case is observed. 
 
+\begin{figure}[t]
+\begin{center}
+\epsfig{figure=write.eps}
+\caption{\small Write bandwidth of Local, NFS, {\proj} and FuseDFS
+with 1 replica and 3 replicas respectively.}
+\label{fig:write}
+\vspace{-6pt}
+\end{center}
+\end{figure}
+
 \subsection{Write Performance}
+As described earlier, Hadoop library has a limitation where it doesn't support
+random writes, thus we encounter errors on both FuseDFS and {\proj}.
+Table~\ref{tab:write} shows an example of error messages that we encountered
+when trying to perform parallel writes on FuseDFS. According to the
+wiki~\cite{fuse}, the way to support random writes is to use methods like RPC
+and protobuf instead of HDFS library. However, there is no way to verify that
+because there is no existing projects that work yet. By the time we realized this
+problem is caused by the HDFS library, it was too late for us to change the
+design of {\proj} and use protobuf instead. Hence, here we only evaluate
+performance of sequential writes within one process. We run the same benchmark
+that writes 1GB file with the block size of 64MB to measure the write bandwidth.
+Similarly, we measure the performance on HDFS configured with 1 replica and 3
+replicas respectively.
+\begin{table}[t]
+	\centering \small \begin{tabular}{ccc} \toprule {\bf Function} &{\bf
+Mode} &{\bf Error} \\\otoprule {\tt MPI\_File\_write\_at} & {\tt CREATE|RDWR} &
+	cannot open an hdfs file in O\_RDWR mode \\ {\tt MPI\_File\_write\_at} &
+	{\tt CREATE|WRONLY} & cannot open an hdfs file in O\_RDWR mode \\ {\tt
+MPI\_File\_write\_at} & {\tt WRONLY} & cannot open an hdfs file in O\_RDWR mode
+	\\ {\tt MPI\_File\_write\_shared} & {\tt WRONLY} & cannot open an hdfs
+	file in O\_RDWR mode \\ {\tt MPI\_File\_write\_shared} & {\tt APPEND}
+&file open.  code: 201388309\\\bottomrule \end{tabular} \caption{\small Error
+codes for parallel writes on FuseDFS.} \label{tab:write}
+\end{table}
+
+Figure~\ref{fig:write} shows the results. The results are quite surprising.
+FuseDFS performs better than {\proj} and NFS both in HDFS with 1 replica and 3
+replicas. {\color{red} What to say here? just say we have no idea why this
+happens? I don't really know how the library triggers write, maybe you can think
+of some reasons for this?} 
+
+\subsection{Performance Overhead}
+In this section we evaluate the performance overhead of {\proj} against standard
+MPI-IO library when accessing normal files. Since {\proj} is designed as a hook
+that determines whether we need to trigger MPI standard functions or our own.
+{\color{red} find a better way to say this..} If {\proj} determines that the
+operation is not an HDFS file operation, it directly hands over the control to
+MPI standard functions. Therefore, we expect negligible
+overhead from {\proj} when performing normal file operations. To verify this, we
+conduct experiments that measure both read and write bandwidths on local files. We use MPI-IO
+standard operation bandwidths as our baseline. 
+
+Figure~\ref{fig:over} shows the results. We can see that there is almost no
+performance overhead caused by {\proj}. Same results are also observed in write
+operations. Specifically, {\proj} out perform native MPI-IO with 0.5\%.
+
+\begin{figure}[t]
+\begin{center}
+\epsfig{figure=over1.eps}
+\caption{\small Read overhead of {\proj} normalized to native MPI-IO.}
+\label{fig:over}
+\vspace{-6pt}
+\end{center}
+\end{figure}
